@@ -10,7 +10,7 @@
 
 using namespace std;
 
-inline void Log(FILE* lf, string msg) {
+void Log(FILE* lf, string msg) {
     fprintf(lf, "%u: %s\n",  time(0), msg.c_str());
 }
 
