@@ -24,10 +24,11 @@
 int main() {
     using namespace std;
     FILE * log;
-    log = fopen("/home/spaceconcordia/space/awesome.log", "w");      
-    string result = "Some useful information";
+    log = fopen("/var/log/space/error.log", "a");      
+    string result = "Some useful ERROR information";
+    int priority = 9; //highest priority
     if(log!=NULL) {
-        Log(log, result);
+        Log(log, priority, result);
     }
-        fclose( log);
+    fclose( log);
 }

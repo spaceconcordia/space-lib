@@ -10,8 +10,9 @@
 
 using namespace std;
 
-void Log(FILE* lf, string msg) {
-    fprintf(lf, "%u: %s\n",  time(0), msg.c_str());
+void Log(FILE* lf, int priority, string msg) {
+    fflush(lf);
+    fprintf(lf, "%d: %u: %s\n", priority, time(0), msg.c_str());
 }
 
 string get_filename(string folder, string prefix, string suffix) {

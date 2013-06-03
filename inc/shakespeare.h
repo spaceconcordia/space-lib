@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-void Log(FILE* lf, string msg);
+void Log(FILE* lf, int priority, string msg);
 string get_filename(string folder, string prefix, string suffix);
 
 
