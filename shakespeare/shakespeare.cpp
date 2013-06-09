@@ -5,14 +5,34 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <algorithm>
+#include <cstdio>
+#include <ctime>
 #include <sstream>
 #include <string>
 
 using namespace std;
 
-void Log(FILE* lf, int priority, string msg) {
+enum Priority {
+    NOTICE,
+    WARNING,
+    DEBUG,
+    ERROR,
+    URGENT,
+    CRITICAL
+};
+string apriori[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT", "CRITICAL"};
+
+void Log(FILE* lf, Priority ePriority, string process, string msg) {
+       
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer [80];
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(buffer,80,"%Y-%m-%d %H.%M.%S",timeinfo);
+
     fflush(lf);
-    fprintf(lf, "%d: %u: %s\n", priority, time(0), msg.c_str());
+    fprintf(lf, "%s :: %s :: %s :: %s\n", apriori[ePriority].c_str(), buffer, process.c_str(), msg.c_str());
 }
 
 string get_filename(string folder, string prefix, string suffix) {

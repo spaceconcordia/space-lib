@@ -4,7 +4,16 @@
 #include <string>
 using namespace std;
 
-void Log(FILE* lf, int priority, string msg);
+enum Priority {
+    NOTICE,
+    WARNING,
+    DEBUG,
+    ERROR,
+    URGENT,
+    CRITICAL
+};
+
+void Log(FILE* lf, Priority ePriority, string process, string msg);
 string get_filename(string folder, string prefix, string suffix);
 
 

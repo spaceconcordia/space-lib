@@ -14,6 +14,8 @@ buildBin:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) src/*.cpp -o bin/shakespeare
 buildQ6:
 	$(MICROCC) $(MICROCFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp -l shakespeare-mbcc
+buildQ6Shared:
+	$(MICROCC) $(MICROCFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp libshakespeare.so
 buildx86:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp -l shakespeare
 #buildAllTests: buildUnitTests

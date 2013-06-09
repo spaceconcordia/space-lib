@@ -25,10 +25,11 @@ int main() {
     using namespace std;
     FILE * log;
     log = fopen("/var/log/space/error.log", "a");      
+    Priority logPriority = DEBUG; //enum
+    string process = "TestProc";
     string result = "Some useful ERROR information";
-    int priority = 9; //highest priority
     if(log!=NULL) {
-        Log(log, priority, result);
+        Log(log, logPriority, process, result);
     }
     fclose( log);
 }
