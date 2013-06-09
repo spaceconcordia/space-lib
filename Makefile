@@ -2,6 +2,7 @@ CC=g++
 MICROCC=microblaze-unknown-linux-gnu-g++
 CFLAGS=-Wall
 MICROCFLAGS=-mcpu=v8.10.a -mxl-barrel-shift -mxl-multiply-high -mxl-pattern-compare -mno-xl-soft-mul -mno-xl-soft-div -mxl-float-sqrt -mhard-float -mxl-float-convert -ffixed-r31 --sysroot /usr/local/lib/mbgcc/microblaze-unknown-linux-gnu/sys-root -Wall
+SHAREDMICROFLAGS = $(MICROFLAGS) -fPIC 
 DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
 INCPATH=-I./inc/
 # INCTESTPATH=-I./tests/unit/stubs/ -I./tests/helpers/include/
@@ -15,7 +16,7 @@ buildBin:
 buildQ6:
 	$(MICROCC) $(MICROCFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp -l shakespeare-mbcc
 buildQ6Shared:
-	$(MICROCC) $(MICROCFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp libshakespeare.so
+	$(MICROCC) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp lib/libshakespeare-0.0.1.so
 buildx86:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) bin/main.cpp -l shakespeare
 #buildAllTests: buildUnitTests
