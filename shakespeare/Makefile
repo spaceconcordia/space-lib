@@ -11,8 +11,8 @@ LIBPATH=-L./lib/
 buildX86Static:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare.o
 buildQ6Static:
-	$(MICROPP) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare.o
+	$(MICROPP) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
 buildX86Shared:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) -shared -c src/shakespeare.cpp -o lib/shakespeare.o
 buildQ6Shared:
-	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -c src/shakespeare.cpp -o lib/shakespeare.o
+	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
