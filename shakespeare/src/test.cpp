@@ -17,19 +17,31 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <iostream>
-//#include "shakespeare.h"
-#include "../inc/shakespeare.h"
+#include "shakespeare.h"
 
 int main() {
     using namespace std;
+
+    string some_process = "TestProc"; // should increment timestamp rather than index
+    string some_directory = "./log/"; // need trailing slash
+    string some_extension = ".log"; // need '.'
+    string some_filename = get_filename
+            (
+                some_directory,some_process,some_extension
+            );
+    string some_filepath = some_directory + some_filename;
+
+    char *filep = new char[some_filename.length() + some_directory.length() + 1]; 
+    strcpy(filep,some_filepath.c_str());
+
     FILE * log;
-    log = fopen("/var/log/space/error.log", "a");      
+    log = fopen(filep, "a");
     Priority logPriority = DEBUG; //enum
-    string process = "TestProc";
     string result = "Some useful ERROR information";
     if(log!=NULL) {
-        Log(log, logPriority, process, result);
+        Log(log, logPriority, some_process, result);
     }
     fclose( log);
 }

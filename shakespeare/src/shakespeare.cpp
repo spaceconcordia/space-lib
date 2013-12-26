@@ -39,9 +39,9 @@ string get_filename(string folder, string prefix, string suffix) {
     struct dirent *entry;
     vector<string> directoryListing;
     
-    if( pDIR = opendir(folder.c_str()) )
+    if( ( pDIR = opendir(folder.c_str()) ) )
 	{
-        while(entry = readdir(pDIR))
+        while( ( entry = readdir(pDIR) ) )
 		{
 			string currentFileName = entry->d_name;
 			if( currentFileName.find(suffix) != string::npos)
@@ -59,10 +59,10 @@ string get_filename(string folder, string prefix, string suffix) {
 
         string last = directoryListing.back();
         string result;
-        int index = 0;
+        size_t index = 0;
         bool copy = false;
 
-        while(index != last.length()) {
+        while( index != last.length() ) {
             if (last[index] == '.') {
                 copy = !copy;
             }
@@ -82,4 +82,3 @@ string get_filename(string folder, string prefix, string suffix) {
     
     return prefix + ss.str() + suffix;
 }
-

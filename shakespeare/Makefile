@@ -16,3 +16,6 @@ buildX86Shared:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) -shared -c src/shakespeare.cpp -o lib/shakespeare.o
 buildQ6Shared:
 	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
+
+buildTest: 
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) src/test.cpp -lshakespeare -o bin/test.x
