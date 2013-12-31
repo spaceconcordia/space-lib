@@ -15,6 +15,7 @@ enum Priority {
 
 void Log(FILE* lf, Priority ePriority, string process, string msg);
 string get_filename(string folder, string prefix, string suffix);
+string get_filename(string prefix, string suffix);
 
 
 #endif	/* SHAKESPEARE_H */

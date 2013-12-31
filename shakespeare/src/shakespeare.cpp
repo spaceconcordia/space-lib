@@ -7,7 +7,7 @@
 #include <ctime>
 #include <sstream>
 #include <string>
-
+#include <time.h>
 using namespace std;
 
 enum Priority {
@@ -31,6 +31,16 @@ void Log(FILE* lf, Priority ePriority, string process, string msg) {
 
     fflush(lf);
     fprintf(lf, "%s :: %s :: %s :: %s\n", apriori[ePriority].c_str(), buffer, process.c_str(), msg.c_str());
+}
+
+string get_filename(string prefix, string suffix){
+    char buffer[100];
+    
+    time_t now = time(NULL);
+    struct tm tm = *localtime(&now);
+    sprintf(buffer, "%d%d%d%d%d%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+    return prefix + string(buffer) + suffix; 
 }
 
 string get_filename(string folder, string prefix, string suffix) {
