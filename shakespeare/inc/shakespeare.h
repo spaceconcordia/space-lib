@@ -14,7 +14,11 @@ enum Priority {
 };
 
 void Log(FILE* lf, Priority ePriority, string process, string msg);
-string get_filename(string folder, string prefix, string suffix);
 
+int file_space_remaining(char *filepath, size_t write_size);
+
+string validate_filepath(string folder);
+
+string get_filename(string folder, string prefix, string suffix);
 
 #endif	/* SHAKESPEARE_H */

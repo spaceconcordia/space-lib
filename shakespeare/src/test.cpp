@@ -25,12 +25,10 @@ int main() {
     using namespace std;
 
     string some_process = "TestProc"; // should increment timestamp rather than index
-    string some_directory = "./log/"; // need trailing slash
+    string some_directory = "./test log"; // need trailing slash
     string some_extension = ".log"; // need '.'
-    string some_filename = get_filename
-            (
-                some_directory,some_process,some_extension
-            );
+    string some_filename = get_filename(some_directory,some_process,some_extension);
+    //string some_filepath = validate_filepath(some_directory) + some_filename;
     string some_filepath = some_directory + some_filename;
 
     char *filep = new char[some_filename.length() + some_directory.length() + 1]; 
