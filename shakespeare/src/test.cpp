@@ -10,7 +10,7 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Shawn Bulger, 
+ *         Author:  Shawn Bulger,
  *   Organization:  Space Concordia
  *
  * =====================================================================================
@@ -21,25 +21,32 @@
 #include <iostream>
 #include "shakespeare.h"
 
+#define PROCESS "TestProc"
+
 int main() {
     using namespace std;
 
+/*  // uggh
     string some_process = "TestProc"; // should increment timestamp rather than index
-    string some_directory = "./test log"; // need trailing slash
+    string some_directory = "./test_folder/"; // folder must exist
     string some_extension = ".log"; // need '.'
-    string some_filename = get_filename(some_directory,some_process,some_extension);
-    //string some_filepath = validate_filepath(some_directory) + some_filename;
-    string some_filepath = some_directory + some_filename;
+    //string some_filepath = get_filename(some_directory,some_process,some_extension);
+    string some_filepath = get_filename("./test folder","TestProcess",".log");
+    //char *some_filepath = get_filename("./test folder","TestProcess",".log");
 
-    char *filep = new char[some_filename.length() + some_directory.length() + 1]; 
+
+    char *filep = new char[some_filepath.length() + 1];
     strcpy(filep,some_filepath.c_str());
-
-    FILE * log;
+    FILE *log;
     log = fopen(filep, "a");
+*/
+    FILE *test_log;
+    test_log = fopen(get_filename("./test folder","TestProcess",".log").c_str(),"a");
+
     Priority logPriority = DEBUG; //enum
     string result = "Some useful ERROR information";
-    if(log!=NULL) {
-        Log(log, logPriority, some_process, result);
+    if(test_log!=NULL) {
+        Log(test_log, logPriority, PROCESS, result);
     }
-    fclose( log);
+    fclose(test_log);
 }

@@ -25,17 +25,19 @@ enum Priority {
 };
 string apriori[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
 
-void Log(FILE* lf, Priority ePriority, string process, string msg) {
-       
+char *get_custom_time(string format) {
     time_t rawtime;
     struct tm * timeinfo;
-    char buffer [80];
+    char *buffer;
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer,80,"%Y-%m-%d %H.%M.%S",timeinfo);
+    strftime(buffer,80,format.c_str(),timeinfo);
+    return buffer;
+}
 
+void Log(FILE* lf, Priority ePriority, string process, string msg) {
     fflush(lf);
-    fprintf(lf, "%s :: %s :: %s :: %s\n", apriori[ePriority].c_str(), buffer, process.c_str(), msg.c_str());
+    fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), apriori[ePriority].c_str(), process.c_str(), msg.c_str());
 }
 
 int file_space_remaining(char *filepath)
@@ -46,7 +48,8 @@ int file_space_remaining(char *filepath)
     return (MAXFILESIZE - size);
 }
 
-string validate_filepath(string folder) {
+/* if filepath has spaces they must be escaped! */
+string ensure_filepath(string folder) {
     //printf("\nIncoming folder: %s\r\n",folder);
     // check for spaces and slashes
     if ( folder[folder.length()-1] != '/')
@@ -55,6 +58,7 @@ string validate_filepath(string folder) {
     }
     size_t i;
     string temp_folder; // in case we need to add backslash
+    // check for spaces in the given filepath, replace with underscore
     for (i=0;i<(folder.length()-1);i++)
     {
         //if (folder[i] == 0x20 || folder[i] == 0x09 || folder[i] == 0x0a || folder[i] == 0x0b || folder[i] == 0x0d) 
@@ -67,26 +71,27 @@ string validate_filepath(string folder) {
     return folder;
 }
 
-/* if filepath has spaces they must be escaped! */
-string get_filename(string folder, string prefix, string suffix) {
-   
-    //folder = validate_filepath(folder);    
+
+//char *get_filename(string folder, string prefix, string suffix) {
+string get_filename(string folder, string prefix, string suffix) 
+{
+    folder = ensure_filepath(folder);    
     
     DIR *pDIR;
     struct dirent *entry;
     vector<string> directoryListing;
     
     if( ( pDIR = opendir(folder.c_str()) ) )
-	{
-        while( ( entry = readdir(pDIR) ) )
-		{
-			string currentFileName = entry->d_name;
-			if( currentFileName.find(suffix) != string::npos)
-			{
-				directoryListing.push_back(entry->d_name);
-			}
-        }
-        closedir(pDIR);
+	  {
+      while( ( entry = readdir(pDIR) ) )
+		  {
+			  string currentFileName = entry->d_name;
+			  if( currentFileName.find(suffix) != string::npos)
+			  {
+				  directoryListing.push_back(entry->d_name);
+			  }
+      }
+      closedir(pDIR);
     }   
     
     int number = 0;
@@ -98,7 +103,7 @@ string get_filename(string folder, string prefix, string suffix) {
     time (&rawtime);
     timeinfo = localtime(&rawtime);
     //strftime(buffer,80,"%Y-%m-%d_%H:%M:%S",timeinfo);
-    strftime(buffer,80,"%Y-%m-%d",timeinfo); // will open a new log file every day
+    strftime(buffer,80,"%Y%m%d",timeinfo); // will open a new log file every day
 
     struct timeval tv;
     gettimeofday(&tv,NULL);
@@ -128,8 +133,12 @@ string get_filename(string folder, string prefix, string suffix) {
     }   
     stringstream ss;//create a stringstream
     //ss << number;//add number to the stream
-    //ss << buffer;//add stime to the stream
-    ss << time(NULL);//add stime to the stream
-    
-    return prefix + ss.str() + suffix;
+    ss << buffer;//add stime to the stream
+    //ss << time(NULL);//add stime to the stream
+       
+    //char* filepath; 
+    //filepath = malloc(folder.length()+prefix.length()+suffix.length()+1+4);
+    //return filepath;
+
+    return folder + prefix + ss.str() + suffix;
 }
