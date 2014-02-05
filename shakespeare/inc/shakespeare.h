@@ -13,12 +13,17 @@ enum Priority {
     CRITICAL
 };
 
+char *get_custom_time(string format);
+
 void Log(FILE* lf, Priority ePriority, string process, string msg);
 
 int file_space_remaining(char *filepath, size_t write_size);
 
-string validate_filepath(string folder);
+bool directory_exists(const char* directory);
+string ensure_filepath(string folder);
 
 string get_filename(string folder, string prefix, string suffix);
+
+FILE * sl_open_log(string folder,string process);
 
 #endif	/* SHAKESPEARE_H */

@@ -41,7 +41,7 @@ int main() {
     log = fopen(filep, "a");
 */
     FILE *test_log;
-    test_log = fopen(get_filename("./test folder","TestProcess",".log").c_str(),"a");
+    test_log = sl_open_log("./test folder",PROCESS);
 
     Priority logPriority = DEBUG; //enum
     string result = "Some useful ERROR information";

@@ -12,6 +12,7 @@
 #include <sys/time.h>
 
 #define MAXFILESIZE 1024 // bytes
+#define EXTENSION   ".log"
 
 using namespace std;
 
@@ -26,9 +27,9 @@ enum Priority {
 string apriori[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
 
 char *get_custom_time(string format) {
+    char *buffer = (char *) malloc(sizeof(char) * 80);
     time_t rawtime;
     struct tm * timeinfo;
-    char *buffer;
     time (&rawtime);
     timeinfo = localtime(&rawtime);
     strftime(buffer,80,format.c_str(),timeinfo);
@@ -40,16 +41,34 @@ void Log(FILE* lf, Priority ePriority, string process, string msg) {
     fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), apriori[ePriority].c_str(), process.c_str(), msg.c_str());
 }
 
-int file_space_remaining(char *filepath)
-{
+int file_space_remaining(char *filepath) {
     struct stat st;
     stat(filepath, &st);
     size_t size = st.st_size;
     return (MAXFILESIZE - size);
 }
 
+bool directory_exists(const char* directory) {
+    struct stat st;
+    if (stat(directory,&st) == 0) {
+        if ( (st.st_mode) & (S_IFDIR != 0) ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /* if filepath has spaces they must be escaped! */
-string ensure_filepath(string folder) {
+string ensure_filepath(string folder) 
+{
+    //check if filepath exists, else create it
+    if ( !directory_exists(folder.c_str()) ) {
+        printf ("Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", __FILE__,__LINE__); 
+        exit (EXIT_FAILURE);
+        //system("mkdir -p %s",folder);
+    }
+
     //printf("\nIncoming folder: %s\r\n",folder);
     // check for spaces and slashes
     if ( folder[folder.length()-1] != '/')
@@ -82,35 +101,33 @@ string get_filename(string folder, string prefix, string suffix)
     vector<string> directoryListing;
     
     if( ( pDIR = opendir(folder.c_str()) ) )
-	  {
-      while( ( entry = readdir(pDIR) ) )
-		  {
-			  string currentFileName = entry->d_name;
-			  if( currentFileName.find(suffix) != string::npos)
-			  {
-				  directoryListing.push_back(entry->d_name);
-			  }
-      }
-      closedir(pDIR);
+	{
+        while( ( entry = readdir(pDIR) ) )
+        {
+            string currentFileName = entry->d_name;
+            if( currentFileName.find(suffix) != string::npos)
+            {
+                directoryListing.push_back(entry->d_name);
+            }
+        }
+    closedir(pDIR);
     }   
     
     int number = 0;
 
-    // use timestamp rather than number
     time_t rawtime;
     struct tm * timeinfo;
     char buffer [80];
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    //strftime(buffer,80,"%Y-%m-%d_%H:%M:%S",timeinfo);
-    strftime(buffer,80,"%Y%m%d",timeinfo); // will open a new log file every day
+    strftime(buffer,80,"%Y%m%d",timeinfo); // open a new log file every day
 
     struct timeval tv;
     gettimeofday(&tv,NULL);
 
-    if (directoryListing.size() > 0) { 
+    if (directoryListing.size() > 0) 
+    { 
         sort(directoryListing.begin(), directoryListing.end());
-
         string last = directoryListing.back();
         string result;
         size_t index = 0;
@@ -125,7 +142,6 @@ string get_filename(string folder, string prefix, string suffix)
                     result += last[index];
                 }
             }
-
             index += 1;
         }
         number = atoi(result.c_str());
@@ -134,11 +150,18 @@ string get_filename(string folder, string prefix, string suffix)
     stringstream ss;//create a stringstream
     //ss << number;//add number to the stream
     ss << buffer;//add stime to the stream
-    //ss << time(NULL);//add stime to the stream
        
     //char* filepath; 
     //filepath = malloc(folder.length()+prefix.length()+suffix.length()+1+4);
     //return filepath;
-
     return folder + prefix + ss.str() + suffix;
+}
+
+/*
+ * Function to provide shorthand to returning file pointer for 
+ * Shakespeare Log (SL) file
+ */
+FILE * sl_open_log(string folder,string process) {
+    FILE *LogFile = fopen(get_filename(folder, process, EXTENSION).c_str(),"a");
+    return LogFile;
 }

@@ -16,3 +16,23 @@ TEST_F(Shakespeare_Test, SomeTest)
         'b'  // actual
     ); 
 }
+
+// Some test 
+TEST_F(Shakespeare_Test, CatchBadFilepath)
+{    
+    FILE *test_log;
+    test_log = fopen(get_filename("./test folder","TestProcess",".log").c_str(),"a");
+    ASSERT_EQ(
+        'a', // expected
+        'b'  // actual
+    ); 
+}
+
+// Some test 
+TEST_F(Shakespeare_Test, GetCustomTimeTest)
+{
+    ASSERT_EQ(
+        'a', // expected
+        'b'  // actual
+    ); 
+}
