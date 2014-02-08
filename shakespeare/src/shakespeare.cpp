@@ -15,152 +15,154 @@
 #define EXTENSION   ".log"
 
 using namespace std;
-
-enum Priority {
-    NOTICE,
-    WARNING,
-    DEBUG,
-    ERROR,
-    URGENT,
-    CRITICAL
-};
-string apriori[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
-
-char *get_custom_time(string format) {
-    char *buffer = (char *) malloc(sizeof(char) * 80);
-    time_t rawtime;
-    struct tm * timeinfo;
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
-    strftime(buffer,80,format.c_str(),timeinfo);
-    return buffer;
-}
-
-void Log(FILE* lf, Priority ePriority, string process, string msg) {
-    fflush(lf);
-    fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), apriori[ePriority].c_str(), process.c_str(), msg.c_str());
-}
-
-int file_space_remaining(char *filepath) {
-    struct stat st;
-    stat(filepath, &st);
-    size_t size = st.st_size;
-    return (MAXFILESIZE - size);
-}
-
-bool directory_exists(const char* directory) {
-    struct stat st;
-    if (stat(directory,&st) == 0) {
-        if ( (st.st_mode) & (S_IFDIR != 0) ) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/* if filepath has spaces they must be escaped! */
-string ensure_filepath(string folder) 
+namespace Shakespeare
 {
-    //check if filepath exists, else create it
-    if ( !directory_exists(folder.c_str()) ) {
-        printf ("%s Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", 
-                folder.c_str(), __FILE__,__LINE__); 
-        exit (EXIT_FAILURE);
+    enum Priority {
+        NOTICE,
+        WARNING,
+        DEBUG,
+        ERROR,
+        URGENT,
+        CRITICAL
+    };
+    string priorities[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
+
+    char *get_custom_time(string format) {
+        char *buffer = (char *) malloc(sizeof(char) * 80);
+        time_t rawtime;
+        struct tm * timeinfo;
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buffer,80,format.c_str(),timeinfo);
+        return buffer;
     }
 
-    //printf("\nIncoming folder: %s\r\n",folder);
-    // check for spaces and slashes
-    if ( folder[folder.length()-1] != '/')
-    {
-        folder += '/';
+    void log(FILE* lf, Priority ePriority, string process, string msg) {
+        fflush(lf);
+        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
     }
-    size_t i;
-    string temp_folder; // in case we need to add backslash
-    // check for spaces in the given filepath, replace with underscore
-    for (i=0;i<(folder.length()-1);i++)
-    {
-        //if (folder[i] == 0x20 || folder[i] == 0x09 || folder[i] == 0x0a || folder[i] == 0x0b || folder[i] == 0x0d) 
-        if ( isspace(folder[i]) )
-        {
-           folder[i] = '_'; // for now, replace with underscore. bad user.
+
+    int file_space_remaining(char *filepath) {
+        struct stat st;
+        stat(filepath, &st);
+        size_t size = st.st_size;
+        return (MAXFILESIZE - size);
+    }
+
+    bool directory_exists(const char* directory) {
+        struct stat st;
+        if (stat(directory,&st) == 0) {
+            if ( (st.st_mode) & (S_IFDIR != 0) ) {
+                return true;
+            }
         }
+        return false;
     }
-    //printf("\nOutgoing folder: %s\r\n",folder);
-    return folder;
-}
 
+    /* if filepath has spaces they must be escaped! */
+    string ensure_filepath(string folder) 
+    {
+        //check if filepath exists, else create it
+        if ( !directory_exists(folder.c_str()) ) {
+            printf ("%s Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", 
+                    folder.c_str(), __FILE__,__LINE__); 
+            exit (EXIT_FAILURE);
+        }
 
-//char *get_filename(string folder, string prefix, string suffix) {
-string get_filename(string folder, string prefix, string suffix) 
-{
-    folder = ensure_filepath(folder);    
-    
-    DIR *pDIR;
-    struct dirent *entry;
-    vector<string> directoryListing;
-    
-    if( ( pDIR = opendir(folder.c_str()) ) )
-	{
-        while( ( entry = readdir(pDIR) ) )
+        //printf("\nIncoming folder: %s\r\n",folder);
+        // check for spaces and slashes
+        if ( folder[folder.length()-1] != '/')
         {
-            string currentFileName = entry->d_name;
-            if( currentFileName.find(suffix) != string::npos)
+            folder += '/';
+        }
+        size_t i;
+        string temp_folder; // in case we need to add backslash
+        // check for spaces in the given filepath, replace with underscore
+        for (i=0;i<(folder.length()-1);i++)
+        {
+            //if (folder[i] == 0x20 || folder[i] == 0x09 || folder[i] == 0x0a || folder[i] == 0x0b || folder[i] == 0x0d) 
+            if ( isspace(folder[i]) )
             {
-                directoryListing.push_back(entry->d_name);
+               folder[i] = '_'; // for now, replace with underscore. bad user.
             }
         }
-    closedir(pDIR);
-    }   
-    
-    int number = 0;
+        //printf("\nOutgoing folder: %s\r\n",folder);
+        return folder;
+    }
 
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer [80];
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
-    strftime(buffer,80,"%Y%m%d",timeinfo); // open a new log file every day
 
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-
-    if (directoryListing.size() > 0) 
-    { 
-        sort(directoryListing.begin(), directoryListing.end());
-        string last = directoryListing.back();
-        string result;
-        size_t index = 0;
-        bool copy = false;
-
-        while( index != last.length() ) { 
-            if (last[index] == '.') { 
-                copy = !copy;
-            }
-            else {        
-                if (copy) {
-                    result += last[index];
+    //char *get_filename(string folder, string prefix, string suffix) {
+    string get_filename(string folder, string prefix, string suffix) 
+    {
+        folder = ensure_filepath(folder);    
+        
+        DIR *pDIR;
+        struct dirent *entry;
+        vector<string> directoryListing;
+        
+        if( ( pDIR = opendir(folder.c_str()) ) )
+        {
+            while( ( entry = readdir(pDIR) ) )
+            {
+                string currentFileName = entry->d_name;
+                if( currentFileName.find(suffix) != string::npos)
+                {
+                    directoryListing.push_back(entry->d_name);
                 }
             }
-            index += 1;
-        }
-        number = atoi(result.c_str());
-        number += 1; 
-    }   
-    stringstream ss;//create a stringstream
-    //ss << number;//add number to the stream
-    ss << buffer;//add stime to the stream
-       
-    //char* filepath; 
-    //filepath = malloc(folder.length()+prefix.length()+suffix.length()+1+4);
-    //return filepath;
-    return folder + prefix + ss.str() + suffix;
-}
+        closedir(pDIR);
+        }   
+        
+        int number = 0;
 
-/*
- * Function to provide shorthand to returning file pointer for 
- * Shakespeare Log (SL) file
- */
-FILE * sl_open_log(string folder,string process) {
-    FILE *LogFile = fopen(get_filename(folder, process, EXTENSION).c_str(),"a");
-    return LogFile;
+        time_t rawtime;
+        struct tm * timeinfo;
+        char buffer [80];
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buffer,80,"%Y%m%d",timeinfo); // open a new log file every day
+
+        struct timeval tv;
+        gettimeofday(&tv,NULL);
+
+        if (directoryListing.size() > 0) 
+        { 
+            sort(directoryListing.begin(), directoryListing.end());
+            string last = directoryListing.back();
+            string result;
+            size_t index = 0;
+            bool copy = false;
+
+            while( index != last.length() ) { 
+                if (last[index] == '.') { 
+                    copy = !copy;
+                }
+                else {        
+                    if (copy) {
+                        result += last[index];
+                    }
+                }
+                index += 1;
+            }
+            number = atoi(result.c_str());
+            number += 1; 
+        }   
+        stringstream ss;//create a stringstream
+        //ss << number;//add number to the stream
+        ss << buffer;//add stime to the stream
+           
+        //char* filepath; 
+        //filepath = malloc(folder.length()+prefix.length()+suffix.length()+1+4);
+        //return filepath;
+        return folder + prefix + ss.str() + suffix;
+    }
+
+    /*
+     * Function to provide shorthand to returning file pointer for 
+     * Shakespeare Log (SL) file
+     */
+    FILE * open_log(string folder,string process) {
+        FILE *LogFile = fopen(get_filename(folder, process, EXTENSION).c_str(),"a");
+        return LogFile;
+    }
 }
