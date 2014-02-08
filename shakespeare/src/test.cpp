@@ -23,30 +23,17 @@
 
 #define PROCESS "TestProc"
 
+using namespace std;
+
 int main() {
-    using namespace std;
 
-/*  // uggh
-    string some_process = "TestProc"; // should increment timestamp rather than index
-    string some_directory = "./test_folder/"; // folder must exist
-    string some_extension = ".log"; // need '.'
-    //string some_filepath = get_filename(some_directory,some_process,some_extension);
-    string some_filepath = get_filename("./test folder","TestProcess",".log");
-    //char *some_filepath = get_filename("./test folder","TestProcess",".log");
-
-
-    char *filep = new char[some_filepath.length() + 1];
-    strcpy(filep,some_filepath.c_str());
-    FILE *log;
-    log = fopen(filep, "a");
-*/
     FILE *test_log;
-    test_log = sl_open_log("./test folder",PROCESS);
+    test_log = s_open_log("/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder",PROCESS);
 
     Priority logPriority = DEBUG; //enum
     string result = "Some useful ERROR information";
     if(test_log!=NULL) {
-        Log(test_log, logPriority, PROCESS, result);
+        s_log(test_log, logPriority, PROCESS, result);
     }
     fclose(test_log);
 }

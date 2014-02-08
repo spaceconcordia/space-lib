@@ -58,15 +58,14 @@ bool directory_exists(const char* directory) {
     return false;
 }
 
-
 /* if filepath has spaces they must be escaped! */
 string ensure_filepath(string folder) 
 {
     //check if filepath exists, else create it
     if ( !directory_exists(folder.c_str()) ) {
-        printf ("Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", __FILE__,__LINE__); 
+        printf ("%s Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", 
+                folder.c_str(), __FILE__,__LINE__); 
         exit (EXIT_FAILURE);
-        //system("mkdir -p %s",folder);
     }
 
     //printf("\nIncoming folder: %s\r\n",folder);
