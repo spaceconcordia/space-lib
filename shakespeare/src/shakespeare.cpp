@@ -64,9 +64,9 @@ namespace Shakespeare
     {
         //check if filepath exists, else create it
         if ( !directory_exists(folder.c_str()) ) {
-            printf ("%s Directory does not exist! Exiting... TODO create_directory! %s:%d \r\n", 
+            printf ("%s Directory does not exist! Exiting... TODO create_directory! For now, replace space with underscore %s:%d \r\n", 
                     folder.c_str(), __FILE__,__LINE__); 
-            exit (EXIT_FAILURE);
+            //exit (EXIT_FAILURE);
         }
 
         //printf("\nIncoming folder: %s\r\n",folder);
@@ -89,7 +89,6 @@ namespace Shakespeare
         //printf("\nOutgoing folder: %s\r\n",folder);
         return folder;
     }
-
 
     //char *get_filename(string folder, string prefix, string suffix) {
     string get_filename(string folder, string prefix, string suffix) 
@@ -114,16 +113,7 @@ namespace Shakespeare
         }   
         
         int number = 0;
-
-        time_t rawtime;
-        struct tm * timeinfo;
-        char buffer [80];
-        time (&rawtime);
-        timeinfo = localtime(&rawtime);
-        strftime(buffer,80,"%Y%m%d",timeinfo); // open a new log file every day
-
-        struct timeval tv;
-        gettimeofday(&tv,NULL);
+        char *buffer = Shakespeare::get_custom_time("%Y%m%d"); // new file every day
 
         if (directoryListing.size() > 0) 
         { 
