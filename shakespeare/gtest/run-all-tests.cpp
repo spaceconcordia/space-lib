@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "he100_lib_test.cpp"
+#include "shakespeare_lib_test.cpp"
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

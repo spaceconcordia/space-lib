@@ -12,7 +12,10 @@ TODO
 - check if provided directory ends with '/', else add it
 - check if provided suffix starts with '.', else add it
 - check for illegal filepath characters
-- apply max log and file length
+- determine and apply max log and file length
 - make get_filename return full file path as char* rather than string
 - minimize log data, i.e. use timestamp, less "::", etc.
 - log rotation: decide when to make new file, when to delete old, and how
+- test timestamp extremes
+- look at leap second considerations
+- ms/ns rather than s for log entires
