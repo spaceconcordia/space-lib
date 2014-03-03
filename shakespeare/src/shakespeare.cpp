@@ -71,7 +71,6 @@ string ensure_filepath(string folder) {
     return folder;
 }
 
-
 //char *get_filename(string folder, string prefix, string suffix) {
 string get_filename(string folder, string prefix, string suffix) 
 {
