@@ -42,11 +42,14 @@ namespace Shakespeare
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
     }
 
-    int file_space_remaining(char *filepath) {
+    int file_size_limit_reached(char *filepath) {
         struct stat st;
         stat(filepath, &st);
-        size_t size = st.st_size;
-        return (MAXFILESIZE - size);
+        size_t log_file_size = st.st_size;
+        if (MAXFILESIZE < log_file_size) {
+            return 1;
+        }
+        return 0;
     }
 
     bool directory_exists(const char* directory) {
