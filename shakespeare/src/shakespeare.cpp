@@ -55,7 +55,7 @@ namespace Shakespeare
     bool directory_exists(const char* directory) {
         struct stat st;
         if (stat(directory,&st) == 0) {
-            if ( (st.st_mode) & (S_IFDIR != 0) ) {
+            if ( S_ISDIR(st.st_mode) ) {
                 return true;
             }
         }
