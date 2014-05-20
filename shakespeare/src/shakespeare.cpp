@@ -11,6 +11,10 @@
 
 #include <sys/time.h>
 
+#define TIMEBUFFERSIZE 80
+#define READINGSIZE 4 // bytes
+#define PRIORITYSIZE 1 // byte
+
 #define MAXFILESIZE 1024 // bytes
 #define EXTENSION   ".log"
 
@@ -28,7 +32,7 @@ namespace Shakespeare
     string priorities[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
 
     char *get_custom_time(string format) {
-        char *buffer = (char *) malloc(sizeof(char) * 80);
+        char *buffer = (char *) malloc(TIMEBUFFERSIZE);
         time_t rawtime;
         struct tm * timeinfo;
         time (&rawtime);
@@ -38,10 +42,23 @@ namespace Shakespeare
     }
 
     void log(FILE* lf, Priority ePriority, string process, string msg) {
+        if (lf==NULL) exit(EXIT_FAILURE);
         fflush(lf);
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
     }
 
+    void logBin(FILE* lf, Priority ePriority, string process, unsigned char * data) {
+        if (lf==NULL) exit(EXIT_FAILURE);
+        fflush(lf);
+        fwrite(time(NULL),sizeof(int),1,lf);
+        //fwrite(process,sizeof(int),1,lf);i
+        int process_int = 3; // hardcoded until subsystem index is updated
+        fwrite(&process_int,sizeof(int),1,lf); 
+        fwrite(&ePriority,sizeof(int),1,lf);
+        fwrite(data, sizeof(char), sizeof(data),lf);
+        fwrite("\n", sizeof(char), 1,lf);
+    }
+    
     int file_size_limit_reached(char *filepath) {
         struct stat st;
         stat(filepath, &st);
