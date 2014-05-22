@@ -5,3 +5,5 @@
 *.log
 *.swp
 shakespeare_test
+lib/
+
