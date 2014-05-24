@@ -37,7 +37,9 @@ namespace Shakespeare
         return buffer;
     }
 
-    void log(FILE* lf, Priority ePriority, string process, string msg) {
+    // TODO open and close file, requires passing log file path
+    int log(FILE* lf, Priority ePriority, string process, string msg) {
+        if ( lf == NULL ) return 1;
         fflush(lf);
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
     }

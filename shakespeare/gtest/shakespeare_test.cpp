@@ -90,3 +90,11 @@ TEST_F(Shakespeare_Test, DirectoryExists)
         ); 
     }   
 }
+
+TEST_F(Shakespeare_Test, NullFilePointer)
+{
+    FILE * nfp;
+    int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Poitner");
+
+    ASSERT_EQ(1,result);
+}
