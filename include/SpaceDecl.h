@@ -22,6 +22,7 @@
 #define CS1_TGZ             "/home/tgz"
 #define CS1_PIPES           "/home/pipes"
 #define CS1_WATCH_PUPPY_PID "/home/pids/watch-puppy.pid"
+#define CS1_TMP             "/tmp"
 #define NDEBUG              /* disable assertion (assert.h) in production version */
 
 #else
@@ -34,6 +35,7 @@
 #define CS1_TGZ             "./tgz"
 #define CS1_PIPES           "./pipes"
 #define CS1_WATCH_PUPPY_PID "./pids/watch-puppy.pid"
+#define CS1_TMP             "."
 
 #endif
 
