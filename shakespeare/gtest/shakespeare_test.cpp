@@ -131,3 +131,11 @@ TEST_F(Shakespeare_Test, Binary)
     if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
     ASSERT_EQ(1,1);
 }
+
+TEST_F(Shakespeare_Test, NullFilePointer)
+{
+    FILE * nfp;
+    int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Poitner");
+
+    ASSERT_EQ(1,result);
+}

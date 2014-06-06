@@ -16,7 +16,7 @@ namespace Shakespeare
 
     char *get_custom_time(string format);
 
-    void log(FILE* lf, Priority ePriority, string process, string msg);
+    int log(FILE* lf, Priority ePriority, string process, string msg);
 
     void logBin(FILE* lf, Priority ePriority, int process_id, int data); 
 
