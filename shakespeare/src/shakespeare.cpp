@@ -47,15 +47,19 @@ namespace Shakespeare
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
     }
 
-    void logBin(FILE* lf, Priority ePriority, string process, unsigned char * data) {
+/** Method to log a single integer to file as binary, which will 
+ *  support most logging needs
+ *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
+ */
+    void logBin(FILE* lf, Priority ePriority, int process_id, int data) {
         if (lf==NULL) exit(EXIT_FAILURE);
         fflush(lf);
-        fwrite(time(NULL),sizeof(int),1,lf);
-        //fwrite(process,sizeof(int),1,lf);i
-        int process_int = 3; // hardcoded until subsystem index is updated
-        fwrite(&process_int,sizeof(int),1,lf); 
+	time_t itime;
+	time(&itime);
+        fwrite(&itime,sizeof(time_t),1,lf);
+        fwrite(&process_id,sizeof(int),1,lf); 
         fwrite(&ePriority,sizeof(int),1,lf);
-        fwrite(data, sizeof(char), sizeof(data),lf);
+        fwrite(&data, sizeof(int), sizeof(data),lf);
         fwrite("\n", sizeof(char), 1,lf);
     }
     
@@ -84,7 +88,8 @@ namespace Shakespeare
     {
         //check if filepath exists, else create it
         if ( !directory_exists(folder.c_str()) ) {
-            printf ("%s Directory does not exist! Exiting... TODO create_directory! For now, replace space with underscore %s:%d \r\n", 
+	    // TODO create_directory! For now, replace space with underscore 
+            printf ("%s Directory does not exist! Exiting... %s:%d \r\n", 
                     folder.c_str(), __FILE__,__LINE__); 
             //exit (EXIT_FAILURE);
         }

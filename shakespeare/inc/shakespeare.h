@@ -18,6 +18,8 @@ namespace Shakespeare
 
     void log(FILE* lf, Priority ePriority, string process, string msg);
 
+    void logBin(FILE* lf, Priority ePriority, int process_id, int data); 
+
     int file_size_limit_reached(char *filepath, size_t write_size);
 
     bool directory_exists(const char* directory);
