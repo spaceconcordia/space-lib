@@ -30,12 +30,13 @@
 * For unit testing, we prefer not to use the real paths, instead create/populate directories on the fly.
 * Define -DCS1_UTEST in makefile and create/remove test directories in setup()/teardown() 
 */
-#define CS1_APPS            "./apps"
-#define CS1_LOGS            "./logs"
-#define CS1_TGZ             "./tgz"
-#define CS1_PIPES           "./pipes"
-#define CS1_WATCH_PUPPY_PID "./pids/watch-puppy.pid"
-#define CS1_TMP             "."
+#define CS1_UTEST_DIR       "cs1_utest"             // Create this directory within the makefile and use
+#define CS1_APPS            CS1_UTEST_DIR"/apps"    // Create all other within setup() of your tests
+#define CS1_LOGS            CS1_UTEST_DIR"/logs"
+#define CS1_TGZ             CS1_UTEST_DIR"/tgz"
+#define CS1_PIPES           CS1_UTEST_DIR"/pipes"
+#define CS1_WATCH_PUPPY_PID CS1_UTEST_DIR"/pids/watch-puppy.pid"
+#define CS1_TMP             CS1_UTEST_DIR
 
 #endif
 
