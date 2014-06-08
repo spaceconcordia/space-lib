@@ -110,32 +110,33 @@ TEST_F(Shakespeare_Test, DirectoryExists)
 /* This test does not make sense at all yet */
 TEST_F(Shakespeare_Test, Binary)
 {
+    // make a binary log entry
     FILE *test_log;
     test_log = Shakespeare::open_log("/tmp/",PROCESS);
     Shakespeare::Priority logPriority = Shakespeare::DEBUG; //enum
-    int result = 5;
-    Shakespeare::logBin(test_log, logPriority, 3, result);
+    int bin_val = 5;
+    int result = Shakespeare::logBin(test_log, 3, logPriority, bin_val);
     fclose(test_log);
+  
+    // test that logBin is successful
+    ASSERT_EQ(1,result);
     
-    long lSize;
-    char * buffer;
-    size_t res;
-    fseek(test_log, 0, SEEK_END);
-    lSize = ftell (test_log);
-    rewind (test_log);
-
-    buffer = (char*) malloc (sizeof(char)*lSize);
-    if (buffer==NULL) {fputs ("Memory error",stderr); exit (2);}
+    // read the entry from the log file
+    char * logEntry = malloc (BINARYLOGENTRYSIZE);
+    if (logEntry==NULL) ASSERT_EQ(1,0);
+    int read_val = readBin(logEntry, test_log, PROCESS);
+    struct Shakespeare::BinaryLogEntry binary_log_entry = parseEntry(logEntry);    free (logEntry);
     
-    res = fread (buffer,1,lSize,test_log);
-    if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
-    ASSERT_EQ(1,1);
+    ASSERT_EQ(binary_log_entry.date_time,bin_val); // TODO how to freeze time for testing? 
+    ASSERT_EQ(binary_log_entry.subsystem,3); 
+    ASSERT_EQ(binary_log_entry.priority,logPriority); 
+    ASSERT_EQ(binary_log_entry.data,bin_val); 
 }
 
 TEST_F(Shakespeare_Test, NullFilePointer)
 {
     FILE * nfp;
-    int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Poitner");
+    int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Pointer");
 
     ASSERT_EQ(1,result);
 }

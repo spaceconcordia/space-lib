@@ -18,7 +18,7 @@ namespace Shakespeare
 
     int log(FILE* lf, Priority ePriority, string process, string msg);
 
-    void logBin(FILE* lf, Priority ePriority, int process_id, int data); 
+    int logBin(FILE* lf, Priority ePriority, int process_id, int data); 
 
     int file_size_limit_reached(char *filepath, size_t write_size);
 
