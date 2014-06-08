@@ -64,7 +64,6 @@
 #define CS1_APPS_CURRENT    CS1_APPS"/current"
 #define CS1_APPS_NEW        CS1_APPS"/new"
 
-
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
 #define CS1_TGZ_MAX CS1_MAX_FRAME_SIZE
@@ -77,6 +76,8 @@
 #define NDEBUG              /* disable assertion (assert.h) in production version */
 #endif
 
+// Commander Config
+#define COMMANER_SLEEP_TIME 1       // seconds
 
 
 #endif
