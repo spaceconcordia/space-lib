@@ -5,5 +5,9 @@
 **/*.log
 **/*.swp
 shakespeare_test
-lib/* !lib/README.txt
+shakespeare.h
+fletcher.h
+SC_he100.h
+timer.h
 include/*.h !include/SpaceDecl.h
+lib/* !lib/README.txt
