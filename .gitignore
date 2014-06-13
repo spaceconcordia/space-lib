@@ -1,9 +1,9 @@
-*.a
-*.so
-*.o
-*.x
-*.log
-*.swp
+**/*.a
+**/*.so
+**/*.o
+**/*.x
+**/*.log
+**/*.swp
 shakespeare_test
-lib/* !README.txt
-include/* !SpaceDecl.h*
+lib/* !lib/README.txt
+include/*.h !include/SpaceDecl.h
