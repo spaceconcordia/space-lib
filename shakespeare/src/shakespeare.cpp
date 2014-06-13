@@ -42,6 +42,7 @@ namespace Shakespeare
         if ( lf == NULL ) return 1;
         fflush(lf);
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        return 0;
     }
 
     int file_size_limit_reached(char *filepath) {

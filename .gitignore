@@ -5,5 +5,5 @@
 *.log
 *.swp
 shakespeare_test
-lib/
-
+lib/* !README.txt
+include/* !SpaceDecl.h*
