@@ -15,41 +15,69 @@
 #include <limits.h>
 
 
-#ifndef CS1_UTEST           /* add -DCS1_UTEST to the ENV flag in the makefile to activate the test environment */
+/*
+ * Q6 and PC environment
+ */
 
+// Base directories
 #define CS1_APPS            "/home/apps"
 #define CS1_LOGS            "/home/logs"
 #define CS1_TGZ             "/home/tgz"
 #define CS1_PIPES           "/home/pipes"
-#define CS1_WATCH_PUPPY_PID "/home/pids/watch-puppy.pid"
+#define CS1_PIDS            "/home/pids"
 #define CS1_TMP             "/tmp"
-#define NDEBUG              /* disable assertion (assert.h) in production version */
 
-#else
+
+
+#ifdef CS1_UTEST 
+/* add -DCS1_UTEST to the ENV flag in the makefile to activate the test environment */
 /*
-* For unit testing, we prefer not to use the real paths, instead create/populate directories on the fly.
-* Define -DCS1_UTEST in makefile and create/remove test directories in setup()/teardown() 
-*/
-#define CS1_APPS            "./apps"
-#define CS1_LOGS            "./logs"
-#define CS1_TGZ             "./tgz"
-#define CS1_PIPES           "./pipes"
-#define CS1_WATCH_PUPPY_PID "./pids/watch-puppy.pid"
-#define CS1_TMP             "."
+ * Unit test environment
+ *
+ * For unit testing, we prefer not to use the real paths for some directories, 
+ * instead create/populate directories on the fly.
+ * Define -DCS1_UTEST in makefile and create/remove test directories in setup()/teardown() 
+ */
+// Base directories
+#define CS1_UTEST_DIR       "cs1_utest"             // Create this directory within the makefile
+                                                    // Create all others within setup() of your tests
+#undef CS1_LOGS
+#define CS1_LOGS            CS1_UTEST_DIR"/logs"
+
+#undef CS1_TGZ
+#define CS1_TGZ             CS1_UTEST_DIR"/tgz"
+
+#undef CS1_TMP
+#define CS1_TMP             CS1_UTEST_DIR
 
 #endif
 
+// Files
+#define CS1_WATCH_PUPPY_PID CS1_PIDS"/watch-puppy.pid"
 
+// Binaries
+#define CS1_BABY_CRON_BIN   CS1_APPS"/current/baby-cron/baby-cron"
+#define CS1_WATCH_PUPPY_BIN CS1_APPS"/current/watch-puppy/watch-puppy"
+#define CS1_COMMANDER_BIN   CS1_APPS"/current/space-commander/space-commander"
 
+// Updater folders
+#define CS1_APPS_CURRENT    CS1_APPS"/current"
+#define CS1_APPS_NEW        CS1_APPS"/new"
+
+// Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
 #define CS1_TGZ_MAX CS1_MAX_FRAME_SIZE
 
-/* From limits.h */
+// From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */
 #define CS1_PATH_MAX PATH_MAX           /* 4096 chars in a path name including nul */
 
+#ifndef CS1_UTEST 
+#define NDEBUG              /* disable assertion (assert.h) in production version */
+#endif
 
-
+// Commander Config
+#define COMMANER_SLEEP_TIME 1       // seconds
 
 
 #endif
