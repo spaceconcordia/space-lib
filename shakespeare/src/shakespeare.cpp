@@ -54,6 +54,7 @@ namespace Shakespeare
         if ( lf == NULL ) return NULL_FILE_POINTER;
         fflush(lf);
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+<<<<<<< HEAD
 	return 0;
     }
 
@@ -73,6 +74,9 @@ namespace Shakespeare
         actual_size = actual_size + fwrite(&data, sizeof(int), sizeof(data),lf);
         actual_size = actual_size + fwrite("\n", sizeof(char), 1,lf);
 	return (actual_size == BINARYLOGENTRYSIZE) ? 0 : 1;
+=======
+        return 0;
+>>>>>>> master
     }
 
     // struct to hold the parsed values of a binary log entry

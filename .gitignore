@@ -1,9 +1,15 @@
-*.a
-*.so
-*.o
-*.x
-*.log
-*.swp
+**/*.a
+**/*.so
+**/*.o
+**/*.x
+**/*.log
+**/*.swp
 shakespeare_test
-lib/
-
+shakespeare.h
+fletcher.h
+SC_he100.h
+NamedPipe.h
+Net2Com.h
+timer.h
+include/*.h !include/SpaceDecl.h
+lib/* !lib/README.txt
