@@ -79,5 +79,12 @@
 // Commander Config
 #define COMMANER_SLEEP_TIME 1       // seconds
 
+#define NULL_MALLOC             7
+#define FAILED_OPEN_PORT        8
+#define FAILED_CLOSE_PORT       9
+#define NOT_A_TTY               10
+#define INVALID_BYTE_SEQUENCE   13
+#define WRONG_LENGTH            14
+#define INVALID_COMMAND         15
 
 #endif
