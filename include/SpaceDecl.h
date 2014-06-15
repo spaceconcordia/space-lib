@@ -79,12 +79,15 @@
 // Commander Config
 #define COMMANER_SLEEP_TIME 1       // seconds
 
-#define NULL_MALLOC             7
-#define FAILED_OPEN_PORT        8
-#define FAILED_CLOSE_PORT       9
-#define NOT_A_TTY               10
-#define INVALID_BYTE_SEQUENCE   13
-#define WRONG_LENGTH            14
-#define INVALID_COMMAND         15
+// General error codes
+#define CS1_NULL_MALLOC             7
+#define CS1_INVALID_BYTE_SEQUENCE   13
+#define CS1_WRONG_LENGTH            14
+
+// Transceiver error codes
+#define HE_FAILED_OPEN_PORT         8
+#define HE_FAILED_CLOSE_PORT        9
+#define HE_NOT_A_TTY                10
+#define HE_HE_INVALID_COMMAND       15
 
 #endif
