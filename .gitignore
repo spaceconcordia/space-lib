@@ -13,3 +13,6 @@ Net2Com.h
 timer.h
 include/*.h !include/SpaceDecl.h
 lib/* !lib/README.txt
+
+utls/bin
+utls/lib
