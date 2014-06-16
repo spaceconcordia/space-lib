@@ -66,7 +66,6 @@
 
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
-#define CS1_TGZ_MAX CS1_MAX_FRAME_SIZE
 
 // From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */
