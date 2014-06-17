@@ -87,6 +87,8 @@
 #define HE_FAILED_OPEN_PORT         8
 #define HE_FAILED_CLOSE_PORT        9
 #define HE_NOT_A_TTY                10
-#define HE_INVALID_COMMAND       15
+#define HE_INVALID_COMMAND          15
+#define HE_NOT_READY                16
+#define HE_POWER_OFF                17
 
 #endif
