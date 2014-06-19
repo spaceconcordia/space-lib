@@ -70,21 +70,31 @@ TEST_F(Shakespeare_Test, GetCustomDate)
 // TODO test a REALLY long filepath
 TEST_F(Shakespeare_Test, DirectoryExists)
 {
-    const char *valid_directories[3] = {"/tmp","/var","/usr/lib/"};
-    const char *invalid_directories[2] = {"/foo","/foo/bar/"};
+    const int num_valid_dir = 3;
+    const int num_invalid_dir = 3;
+    const char *valid_directories[num_valid_dir] = {"/tmp","/var","/usr/lib/"};
+    const char *invalid_directories[num_invalid_dir] = {"/foo","/foo/bar/","/etc/fstab"};
     
     int i;
-    for (i=0;i<3;i++){
+    for (i=0;i<num_valid_dir;i++){
         ASSERT_EQ(
             1, // expected
             Shakespeare::directory_exists(valid_directories[i])  // actual
         ); 
     }
 
-    for (i=0;i<2;i++){
+    for (i=0;i<num_invalid_dir;i++){
         ASSERT_EQ(
             0, // expected
             Shakespeare::directory_exists(invalid_directories[i])  // actual
         ); 
     }   
+}
+
+TEST_F(Shakespeare_Test, NullFilePointer)
+{
+    FILE * nfp;
+    int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Poitner");
+
+    ASSERT_EQ(1,result);
 }
