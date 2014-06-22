@@ -79,6 +79,7 @@
 #define COMMANER_SLEEP_TIME 1       // seconds
 
 // General error codes
+#define CS1_SUCCESS                 0
 #define CS1_NULL_MALLOC             7
 #define CS1_INVALID_BYTE_SEQUENCE   13
 #define CS1_WRONG_LENGTH            14
@@ -90,5 +91,8 @@
 #define HE_INVALID_COMMAND          15
 #define HE_NOT_READY                16
 #define HE_POWER_OFF                17
+#define HE_FAILED_TTY_CONFIG        18
+#define HE_FAILED_SET_BAUD          19
+#define HE_FAILED_FLUSH             20
 
 #endif
