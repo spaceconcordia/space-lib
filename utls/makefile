@@ -40,7 +40,7 @@ LIBS=-lCppUTest -lCppUTestExt -lshakespeare
 # All Object files, do not use wildcard, add the ones you need explicitly!
 #
 Q6_TAG=Q6
-OBJECTS = bin/Date.o bin/SpaceString.o
+OBJECTS = bin/Date.o bin/SpaceString.o bin/UTestUtls.o bin/fileIO.o
 OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceStringQ6.o
 
 #
@@ -65,6 +65,8 @@ lib/libcs1_utls.a: $(OBJECTS)
 bin/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO)  $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
 
+bin/fileIO.o: $(SPACE_UPTDATER)/src/fileIO.cpp $(SPACE_UPTDATER)/include/fileIO.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV)
 #
 # mbcc
 #
