@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <string>
+#include <unistd.h>
 
 #include "SpaceDecl.h"
 #include "CppUTest/TestHarness.h"
