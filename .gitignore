@@ -13,3 +13,7 @@ Net2Com.h
 timer.h
 include/*.h !include/SpaceDecl.h
 lib/* !lib/README.txt
+
+shakespeare/lib
+utls/bin
+utls/lib

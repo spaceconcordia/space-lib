@@ -17,5 +17,5 @@ CS1_PIPES="/home/pipes"
 CS1_WATCH_PUPPY_PID="/home/pids/watch-puppy.pid"
 
 CS1_MAX_PATH_LENGTH=150
-
+CS1_MAX_FRAME_SIZE=190
 
