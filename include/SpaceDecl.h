@@ -116,5 +116,8 @@
 #define HE_FAILED_TTY_CONFIG        18
 #define HE_FAILED_SET_BAUD          19
 #define HE_FAILED_FLUSH             20
-
+#define HE_FAILED_CHECKSUM          21
+#define HE_FAILED_NACK              22
+#define HE_INVALID_BYTE_SEQUENCE    23
+#define HE_EMPTY_RESPONSE           24
 #endif
