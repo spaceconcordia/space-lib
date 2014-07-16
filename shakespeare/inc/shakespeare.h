@@ -2,6 +2,7 @@
 #define	SHAKESPEARE_H
 
 #include <string>
+#include <stdint.h>
 using namespace std;
 namespace Shakespeare
 {
@@ -19,6 +20,19 @@ namespace Shakespeare
     int log(FILE* lf, Priority ePriority, string process, string msg);
 
     int logBin(FILE* lf, Priority ePriority, int process_id, int data); 
+
+    // struct to hold the parsed values of a binary log entry
+    typedef struct  {
+        time_t 	date_time;
+        uint8_t subsystem;
+        uint8_t	priority;
+        uint8_t	data;
+    } BinaryLogEntry;
+
+    //int readBinFile(char * buffer, FILE * lf);
+    BinaryLogEntry readBinEntry(string filename);
+
+    int printBinaryEntry(BinaryLogEntry entry);
 
     int file_size_limit_reached(char *filepath, size_t write_size);
 

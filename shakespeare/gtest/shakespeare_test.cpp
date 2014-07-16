@@ -1,8 +1,19 @@
 #include "gtest/gtest.h"
 #include "../inc/shakespeare.h"
+#include "../../include/SpaceDecl.h"
+#include <stdint.h>
 #define PROCESS "GTEST"
 #define BE 1
 #define LE 0
+#define TIMEBUFFERSIZE  80
+#define READINGSIZE     4 // bytes
+#define PRIORITYSIZE    1 // byte
+#define SIZEOF_TIMET    8
+#define SIZEOF_UINT8T   1
+#define SIZEOF_INT      4
+//#define BINARY_LOG_ENTRY_SIZE (SIZEOF_TIMET+SIZEOF_UINT8T+SIZEOF_UINT8T+SIZEOF_UINT8T) // timestamp, subsystem_id, priority_id, reading
+#define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
+#define BINARY_LOG_ENTRY_SIZE 11
 class Shakespeare_Test : public ::testing::Test
 {
     protected:
@@ -35,6 +46,14 @@ char endian(void)
 TEST_F(Shakespeare_Test, LittleEndian)
 {
   ASSERT_EQ(LE,endian());
+}
+
+TEST_F(Shakespeare_Test, TypeTest)
+{
+  ASSERT_EQ(SIZEOF_TIMET,sizeof(time_t));
+  ASSERT_EQ(SIZEOF_UINT8T,sizeof(uint8_t));
+  ASSERT_EQ(SIZEOF_INT,sizeof(int));
+  ASSERT_EQ(BINARY_LOG_ENTRY_SIZE,COMPILER_CALCULATED_LOG_ENTRY_SIZE);
 }
 
 // EnsureFilePath 
@@ -72,6 +91,7 @@ TEST_F(Shakespeare_Test, GetFilename)
 
 /*
 // How to test without just replicating the code? Especially as dates change, I don't want to tamper with the clock...
+// Easy to pass custom time on testing side, but harder to pass custom time through to logging function.
 TEST_F(Shakespeare_Test, GetCustomDate)
 {
     ASSERT_EQ(
@@ -113,30 +133,41 @@ TEST_F(Shakespeare_Test, Binary)
     // make a binary log entry
     FILE *test_log;
     test_log = Shakespeare::open_log("/tmp/",PROCESS);
-    Shakespeare::Priority logPriority = Shakespeare::DEBUG; //enum
-    int bin_val = 5;
-    int result = Shakespeare::logBin(test_log, 3, logPriority, bin_val);
-    fclose(test_log);
-  
-    // test that logBin is successful
-    ASSERT_EQ(1,result);
-    
-    // read the entry from the log file
-    char * logEntry = malloc (BINARYLOGENTRYSIZE);
-    if (logEntry==NULL) ASSERT_EQ(1,0);
-    int read_val = readBin(logEntry, test_log, PROCESS);
-    struct Shakespeare::BinaryLogEntry binary_log_entry = parseEntry(logEntry);    free (logEntry);
-    
-    ASSERT_EQ(binary_log_entry.date_time,bin_val); // TODO how to freeze time for testing? 
-    ASSERT_EQ(binary_log_entry.subsystem,3); 
-    ASSERT_EQ(binary_log_entry.priority,logPriority); 
-    ASSERT_EQ(binary_log_entry.data,bin_val); 
+    if (test_log != NULL) 
+    {
+        Shakespeare::Priority logPriority = Shakespeare::DEBUG;
+        int bin_val = 5; // hardcoded value mocking as a sensor reading
+        int test_subsystem = 3; 
+        int result = Shakespeare::logBin(test_log, logPriority, test_subsystem, bin_val);    
+        
+        // test that logBin is successful
+        ASSERT_EQ(0,result);
+        fclose(test_log);
+
+        // read an entry from the log file 
+        string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
+        Shakespeare::BinaryLogEntry logEntry;
+        logEntry = Shakespeare::readBinEntry(filename);
+ 
+        // parse the entry from the log file into the struct
+        printf (
+            "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d",
+            BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
+        );
+        //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
+        ASSERT_EQ(logEntry.subsystem,test_subsystem); 
+        //ASSERT_EQ(2,test_subsystem); 
+        ASSERT_EQ(logEntry.priority,logPriority); 
+        //ASSERT_EQ(2,logPriority); 
+        ASSERT_EQ(logEntry.data,bin_val);
+        //ASSERT_EQ(2,bin_val);
+    } else FAIL();
 }
 
 TEST_F(Shakespeare_Test, NullFilePointer)
 {
-    FILE * nfp;
+    FILE * nfp = NULL;
     int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Pointer");
 
-    ASSERT_EQ(1,result);
+    ASSERT_EQ(CS1_NULL_FILE_POINTER,result);
 }

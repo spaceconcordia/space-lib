@@ -66,6 +66,8 @@
 
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
+#define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
+
 
 // From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */
@@ -102,6 +104,7 @@
 #define CS1_NULL_MALLOC             7
 #define CS1_INVALID_BYTE_SEQUENCE   13
 #define CS1_WRONG_LENGTH            14
+#define CS1_NULL_FILE_POINTER       21
 
 // Transceiver error codes
 #define HE_FAILED_OPEN_PORT         8

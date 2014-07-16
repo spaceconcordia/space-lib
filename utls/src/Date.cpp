@@ -12,6 +12,9 @@ Date::Date(){
     this->year = 0;
     this->month = 0;
     this->day = 0;
+    this->hour = 0;
+    this->minute = 0;
+    this->second = 0;
     this->time_t_format = 0;
 }
 
@@ -23,6 +26,22 @@ Date::Date(int year, int month, int day){
     this->BuildString();
     this->MakeTimeT();
 }
+
+Date::DateTimePrecise(int year, int month, int day, int hour, int minute, int second, int milisecond, int microsecond, int nanosecond) {
+    this->year = year;
+    this->month = month;
+    this->day = day;
+    this->hour = hour;
+    this->minute = minute;
+    this->second = second;
+    this->milisecond = milisecond;
+    this->microsecond = microsecond;
+    this->nanosecond = nanosecond;
+
+    this->BuildDateTimePreciseString();
+    this->MakeTimeT();}
+}
+
 
 Date::Date(time_t raw_time){
     struct tm* timeinfo = localtime(&raw_time);
@@ -92,4 +111,15 @@ const char* Date::GetString(void){
 *------------------------------------------------------------------------------*/
 void Date::BuildString(void){
     snprintf(date_str, 9, "%04d%02d%02d", this->year, this->month, this->day);
+}
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+* NAME : BuildDateTimeString
+*
+* PURPOSE : Builds the date_time_str
+*
+*------------------------------------------------------------------------------*/
+void Date::BuildDateTimePreciseString(void){
+    snprintf(date_str, 9, "%04d/%02d/%02d %02d:%02d:%02d", this->year, this->month, this->day, this->hour, this->minute, this->second);
 }
