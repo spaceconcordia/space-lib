@@ -8,18 +8,57 @@
 *
 *----------------------------------------------------------------------------*/
 #include <stdio.h>
+#include <sys/stat.h>
+#include <string>
+#include <unistd.h>
+
+#include "SpaceDecl.h"
 #include "CppUTest/TestHarness.h"
 #include "Date.h"
 #include "SpaceString.h"
-
+#include "UTestUtls.h"
+#include "fileIO.h"
 
 TEST_GROUP(SpaceStringTestGroup)
 {
     void setup() {
     }
+
     void teardown() {
     }
 };
+
+TEST_GROUP(UtlsTestGroup)
+{
+    void setup() {
+        mkdir(CS1_UTEST_DIR, S_IRWXU);
+    }
+    void teardown() {
+        DeleteDirectoryContent(CS1_UTEST_DIR);
+        rmdir(CS1_UTEST_DIR);
+    }
+};
+
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * GROUP : UtlsTestGroup 
+ *
+ * NAME : UTestUtls_CreateFileOfSize_success 
+ *
+ *-----------------------------------------------------------------------------*/
+TEST(UtlsTestGroup, UTestUtls_CreateFileOfSize_success)
+{
+    const int FILE_SIZE = 10;
+    const char* file_path = CS1_UTEST_DIR"/helper.txt";
+    UTestUtls::CreateFileOfSize(file_path, FILE_SIZE);
+
+    struct stat attr;
+    stat(file_path, &attr);
+
+    CHECK_EQUAL(FILE_SIZE, attr.st_size);
+
+}
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *

@@ -30,7 +30,7 @@ INCTESTPATH = -I./tests/stubs/ -I./tests/helpers/include/
 # Libraries
 #
 LIBPATH=-L./lib/  -L$(SPACE_LIB)/shakespeare/lib -L$(CPPUTEST_HOME)/lib
-LIBS=-lCppUTest -lCppUTestExt -lshakespeare
+CPPUTEST_LIBS=-lCppUTest -lCppUTestExt 
 
 #
 #++++++++++++++++++++
@@ -40,8 +40,8 @@ LIBS=-lCppUTest -lCppUTestExt -lshakespeare
 # All Object files, do not use wildcard, add the ones you need explicitly!
 #
 Q6_TAG=Q6
-OBJECTS = bin/Date.o bin/SpaceString.o
-OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceStringQ6.o
+OBJECTS = bin/Date.o bin/SpaceString.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o
+OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o 
 
 #
 # CppUTest files, no wildcard, add files explicitly!
@@ -55,8 +55,9 @@ CS1_UTEST_DIR="cs1_utest" # as defined in SpaceDecl.h
 ENV = -DDEBUG -DCS1_UTEST  #-DPRESERVE
 
 #
-# x86
-#
+#++++++++++++++++++++
+# PC 
+#--------------------
 buildBin: mk_local_dir lib/libcs1_utls.a 
 
 lib/libcs1_utls.a: $(OBJECTS)
@@ -65,9 +66,16 @@ lib/libcs1_utls.a: $(OBJECTS)
 bin/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO)  $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
 
+bin/fileIO.o: $(SPACE_UPTDATER)/src/fileIO.cpp $(SPACE_UPTDATER)/include/fileIO.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV)
+
+bin/dirUtl.o: $(SPACE_SCRIPT)/tgz-wizard/src/dirUtl.cpp $(SPACE_SCRIPT)/tgz-wizard/include/dirUtl.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV)
+
 #
-# mbcc
-#
+#++++++++++++++++++++
+# microblaze 
+#--------------------
 buildQ6: mk_local_dir lib/libcs1_utlsQ6.a
 
 lib/libcs1_utls$(Q6_TAG).a: $(OBJECTS_Q6)
@@ -76,14 +84,21 @@ lib/libcs1_utls$(Q6_TAG).a: $(OBJECTS_Q6)
 bin/%Q6.o: src/%.cpp
 	$(MICROCC) $(MICROCFLAGS) $(INCLUDES) -c $^ -o $@
 
+bin/fileIOQ6.o: $(SPACE_UPTDATER)/src/fileIO.cpp $(SPACE_UPTDATER)/include/fileIO.h
+	$(MICROCC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@
+
+bin/dirUtlQ6.o: $(SPACE_SCRIPT)/tgz-wizard/src/dirUtl.cpp $(SPACE_SCRIPT)/tgz-wizard/include/dirUtl.h
+	$(MICROCC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@
+
 #
+#++++++++++++++++++++
 # unit testing
-#
+#--------------------
 test: mk_local_dir bin/AllTests 
 	mkdir -p $(CS1_UTEST_DIR)
 
 bin/AllTests: tests/AllTests.cpp  $(UNIT_TEST) $(OBJECTS) 
-	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(LIBPATH) -o $@ $^ $(LIBS) $(ENV)
+	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(LIBPATH) -o $@ $^ $(CPPUTEST_LIBS) $(ENV)
 
 mk_local_dir:
 	mkdir -p lib bin
