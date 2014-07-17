@@ -11,7 +11,6 @@
 #define SIZEOF_TIMET    8
 #define SIZEOF_UINT8T   1
 #define SIZEOF_INT      4
-//#define BINARY_LOG_ENTRY_SIZE (SIZEOF_TIMET+SIZEOF_UINT8T+SIZEOF_UINT8T+SIZEOF_UINT8T) // timestamp, subsystem_id, priority_id, reading
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
 #define BINARY_LOG_ENTRY_SIZE 11
 class Shakespeare_Test : public ::testing::Test
@@ -137,31 +136,45 @@ TEST_F(Shakespeare_Test, Binary)
     {
         Shakespeare::Priority logPriority = Shakespeare::DEBUG;
         int bin_val = 5; // hardcoded value mocking as a sensor reading
-        int test_subsystem = 3; 
-        int result = Shakespeare::logBin(test_log, logPriority, test_subsystem, bin_val);    
+        int test_subsystem=3; 
+        int result,i; 
+        int iterations=3;
         
-        // test that logBin is successful
-        ASSERT_EQ(0,result);
-        fclose(test_log);
+        for (i=0;i<iterations;i++) {
+            // write log entries
+            result = Shakespeare::log_bin(test_log, logPriority, test_subsystem, bin_val);    
+            ASSERT_EQ(0,result);
 
-        // read an entry from the log file 
-        string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
-        Shakespeare::BinaryLogEntry logEntry;
-        logEntry = Shakespeare::readBinEntry(filename);
- 
-        // parse the entry from the log file into the struct
-        printf (
-            "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d",
-            BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
-        );
-        //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
-        ASSERT_EQ(logEntry.subsystem,test_subsystem); 
-        //ASSERT_EQ(2,test_subsystem); 
-        ASSERT_EQ(logEntry.priority,logPriority); 
-        //ASSERT_EQ(2,logPriority); 
-        ASSERT_EQ(logEntry.data,bin_val);
-        //ASSERT_EQ(2,bin_val);
+            // fetch log entries
+            string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
+            Shakespeare::BinaryLogEntry logEntry;
+            logEntry = Shakespeare::read_bin_entry(filename,i);
+            printf (
+                "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
+                BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
+            );
+            print_binary_entry(logEntry);
+            //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
+            ASSERT_EQ(test_subsystem,logEntry.subsystem); 
+            ASSERT_EQ(logPriority,logEntry.priority); 
+            ASSERT_EQ(bin_val,logEntry.data);
+            bin_val++;
+            test_subsystem++;
+        }        
+        fclose(test_log);
     } else FAIL();
+}
+
+// try to fetch an entry when not enough bytes are available at the end of the file
+TEST_F(Shakespeare_Test, BinaryFileOutOfBounds) 
+{
+   FAIL(); 
+}
+
+// catch an incomplete entry, log/report the event, and read next available 
+TEST_F(Shakespeare_Test, IncompleteBinaryEntry) 
+{
+   FAIL(); 
 }
 
 TEST_F(Shakespeare_Test, NullFilePointer)

@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
 #include "../../include/SpaceDecl.h"
+#include "../../utls/include/Date.h"
 
 #include <sys/time.h>
 
@@ -72,13 +73,12 @@ namespace Shakespeare
      *  support most logging needs
      *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
     */
-    int logBin(FILE* lf, Priority ePriority, int process_id, int data) {
+    int log_bin(FILE* lf, Priority ePriority, int process_id, int data) {
         if (lf==NULL) return CS1_NULL_FILE_POINTER;
         fflush(lf);
         time_t itime;
         time(&itime);
         size_t elements_written = 0;
-        printf ("%d",ePriority);
         // TODO add deliminator for future validation
         elements_written = elements_written + fwrite(&itime,        SIZEOF_TIMET, 1,lf);
         elements_written = elements_written + fwrite(&process_id,   SIZEOF_UINT8T,1,lf); 
@@ -97,51 +97,52 @@ namespace Shakespeare
         uint8_t	data;
     } BinaryLogEntry;
 
-    // Method to open a binary file
-    // @param buffer
-    // @return int - exit status
-    int readBinFileC(char * buffer, FILE * lf) {
-        // check incoming file pointer
-        if (lf==NULL) return CS1_NULL_FILE_POINTER;
-
-        // read an entry from the log file
-        // obtain file size
-        long lSize;
-        size_t result;
-        fseek(lf, 0, SEEK_END);
-        lSize = ftell (lf);
-        rewind (lf);
-
-        // allocate memory to contain the whole file
-        buffer = (char*) malloc (sizeof(char)*lSize);
-        if (buffer==NULL) {fputs ("Memory error",stderr); return 2;}
-
-        // copy the file into the buffer
-        result = fread (buffer,1,lSize,lf);
-        if ((long)result != lSize) {fputs ("Reading error",stderr); return 3;}
-
-        fclose(lf);
-        return 0;
-    }   
-
-    // Method to open a binary file
-    // @param buffer
-    // @return int - exit status
+    // Method to read an entry from a binary file
+    // @param string filename - the name of the file which stores binary log entries
+    // @param streampos entry_position - the position of the log entry to be read
+    // @return BinaryLogEntry - the BinaryLogEntry struct containing all pertinent data
+    //
     // Our binary log entry size is always the same. Some error checking
     // should be performed to ensure bytes received are expected and
     // and in correct order    
-    BinaryLogEntry readBinEntry(string filename) {
+    // TODO current operation is dangerous and unreliable. A single missing byte will break all future log entry reading - use a delimination phrase between log entries, and scan accordingly
+    BinaryLogEntry read_bin_entry(string filename, streampos entry_position) {
         Shakespeare::BinaryLogEntry log_entry;
         static ifstream inputBinary;
         inputBinary.open(filename.c_str(),ios_base::binary);
-        if (inputBinary) inputBinary.read( (char*)&log_entry, sizeof(log_entry) );
+        streampos abs_position = entry_position*BINARY_LOG_ENTRY_SIZE;
+        
+        // store EOF conditions
+        inputBinary.seekg(0,ios::end);
+        int file_size;
+        file_size = inputBinary.tellg();
+        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/BINARY_LOG_ENTRY_SIZE);
+
+        // seek back to beginning of file
+        inputBinary.seekg(0,ios::beg);
+        if (entry_position > 0) {// seek as required
+            inputBinary.seekg(abs_position);
+        }
+
+        // take a reading if boundary conditions are met
+        int cur_pos = inputBinary.tellg();
+        if ( file_size-cur_pos >= BINARY_LOG_ENTRY_SIZE) {
+            if (inputBinary) { // read and return log entry
+                inputBinary.read( (char*)&log_entry, sizeof(log_entry) );
+            }
+        }
+
+        // close and return
+        inputBinary.close();
         return log_entry;
-    }   
-  
-    void printBinaryEntry(BinaryLogEntry entry) {
+    }
+
+    // print a binary log entry in a human-readable form
+    void print_binary_entry(BinaryLogEntry entry) {
+        Date time(entry.date_time,1);
         printf (
-            "Time:%ld Subsystem:%d Priority%d Value:%d",
-            entry.date_time, entry.subsystem, entry.priority, entry.data
+            "Time:%s Subsystem:%d Priority%d Value:%d\n",
+            time.GetDateTimeString(), entry.subsystem, entry.priority, entry.data
         );
     }
 

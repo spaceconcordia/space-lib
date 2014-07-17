@@ -10,14 +10,14 @@ INCPATH=-I./inc/ -I../../include/
 LIBPATH=-L./lib/ -I../../lib/
 
 buildX86Static:
-	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare.o
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c -lcs1_utls src/shakespeare.cpp -o lib/shakespeare.o
 buildQ6Static:
-	$(MICROPP) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
+	$(MICROPP) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
 buildX86Shared:
-	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) -shared -c src/shakespeare.cpp -o lib/shakespeare.o
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) -shared -c src/shakespeare.cpp -lcs1_utls -o lib/shakespeare.o
 buildQ6Shared:
-	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
+	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
 buildBBStatic:
-	$(BEAGLECC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c src/shakespeare.cpp -o lib/shakespeare-BB.o
+	$(BEAGLECC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-BB.o
 buildTest:
-	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) src/test.cpp -lshakespeare -o bin/test.x
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) src/test.cpp -lshakespeare -lcs1_utls -o bin/test.x
