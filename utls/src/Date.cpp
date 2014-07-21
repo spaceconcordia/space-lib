@@ -1,6 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "Date.h"
+#include <string.h>
 
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -108,7 +109,8 @@ time_t Date::GetTimeT(){
 *
 *------------------------------------------------------------------------------*/
 void Date::MakeTimeT(void){
-    struct tm timeinfo = {0};
+    struct tm timeinfo;
+    memset (&timeinfo, 0, sizeof(tm)); // to clear warning against missing initializer for timeinfo.*
 
     timeinfo.tm_year = this->year - 1900;
     timeinfo.tm_mon  = this->month - 1;

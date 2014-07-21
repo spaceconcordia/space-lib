@@ -6,8 +6,11 @@ BEAGLECC=arm-linux-gnueabi-g++
 MICROCFLAGS=-mcpu=v8.40.b -mxl-barrel-shift -mxl-multiply-high -mxl-pattern-compare -mno-xl-soft-mul -mno-xl-soft-div -mxl-float-sqrt -mhard-float -mxl-float-convert -mlittle-endian
 SHAREDMICROFLAGS = $(MICROFLAGS) -fPIC -shared
 DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
-INCPATH=-I./inc/ -I../../include/
+GLOBAL_INC_PATH=../../include/
+INCPATH=-I./inc/ -I$(GLOBAL_INC_PATH)
 LIBPATH=-L./lib/ -I../../lib/
+
+HEADERS=$(USER_DIR)/inc/timer.h $(UTLS_DIR)/include/Date.h $(GLOBAL_INC_DIR)/SpaceDecl.h $(USER_DIR)/inc/SC_he100.h
 
 buildX86Static:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c -lcs1_utls src/shakespeare.cpp -o lib/shakespeare.o
