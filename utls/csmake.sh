@@ -3,6 +3,7 @@
 
 copy-libs () {
     cp ./lib/*.a ../lib/
+    cp ./include/* ../include/
 }
 
 build-x86 () {

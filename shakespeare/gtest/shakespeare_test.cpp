@@ -191,6 +191,14 @@ TEST_F(Shakespeare_Test, IncompleteBinaryEntry)
 }
 */
 
+// Prevent writing binary to ascii file and visa-versa
+/*
+TEST_F(Shakespeare_Test, CatchBinaryAscii) 
+{
+   FAIL(); 
+}
+*/
+
 TEST_F(Shakespeare_Test, NullFilePointer)
 {
     FILE * nfp = NULL;

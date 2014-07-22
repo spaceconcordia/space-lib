@@ -278,5 +278,4 @@ namespace Shakespeare
             time.GetDateTimeString(), entry.subsystem, priorities[entry.priority].c_str(), entry.data
         );
     }
-    
 }
