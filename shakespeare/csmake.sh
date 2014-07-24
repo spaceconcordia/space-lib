@@ -46,6 +46,7 @@ build-BB () { make buildBBStatic
 }
 
 make_run_tests () {
+    build-x86
     cd gtest
     make clean || fail
     make || fail
