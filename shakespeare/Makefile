@@ -24,3 +24,5 @@ buildBBStatic:
 	$(BEAGLECC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-BB.o
 buildTest:
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) src/test.cpp -lshakespeare -lcs1_utls -o bin/test.x
+clean:
+	rm -f lib/* *.o *.a

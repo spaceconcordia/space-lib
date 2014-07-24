@@ -3,7 +3,7 @@
 
 quit () {
   echo -e "${green}$1${NC}"
-  exit 1
+  exit 0
 }
 
 build-x86 () {
