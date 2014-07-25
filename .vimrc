@@ -12,8 +12,8 @@ set shiftwidth=4
 
 :command WQ wq
 :command Wq wq
-:command W w
-:command Q q
+:command W w 
+:command Q q 
 
 set mouse=r
 
@@ -21,8 +21,8 @@ syntax enable
 "set background=dark
 "colorscheme solarized
 
-nore ; :
-nore , ;
+nore ; : 
+nore , ; 
 
 " set backupdir=~/.vimbackups
 
@@ -77,3 +77,4 @@ set incsearch " ... dynamically as they are typed"
 "
 " more at https://github.com/csexton/dotfiles/blob/master/home/vimrc#L381
 "
+nmap <F8> :TagbarToggle<CR>
