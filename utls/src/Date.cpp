@@ -90,6 +90,23 @@ Date::Date(time_t raw_time, int precision){
     }
 }
 
+const char * GetCustomFormatTime(time_t rawtime, std::string format, int moreminutes) {
+    char buffer[80] = {0};
+    struct tm * timeinfo;
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+    timeinfo->tm_min = timeinfo->tm_min + moreminutes;
+    if ( (timeinfo->tm_min + moreminutes) > 59 ) { 
+        timeinfo->tm_hour++;
+        timeinfo->tm_min = 0 + ( moreminutes - (60-timeinfo->tm_min));
+    }   
+    else {
+        timeinfo->tm_min = timeinfo->tm_min + moreminutes;
+    }   
+    strftime(buffer,80,format.c_str(),timeinfo);
+    return buffer;
+}  
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
 * NAME : GetTimeT
