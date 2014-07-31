@@ -75,7 +75,10 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 ###########################
 
-shakespeare.o : $(USER_DIR)/src/shakespeare.cpp $(USER_DIR)/inc/shakespeare.h $(GTEST_HEADERS)
+GLOBAL_INC_PATH=../../include/
+HEADERS=$(GLOBAL_INC_PATH)/SpaceDecl.h $(GLOBAL_INC_PATH)/Date.h $(USER_DIR)/inc/shakespeare.h
+
+shakespeare.o : $(USER_DIR)/src/shakespeare.cpp  $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) -I$(USER_DIR)/inc/ $(CXXFLAGS) -c $(USER_DIR)/src/shakespeare.cpp 
 
 Date.o : $(UTLS_DIR)/src/Date.cpp $(UTLS_DIR)/include/Date.h $(GTEST_HEADERS)
