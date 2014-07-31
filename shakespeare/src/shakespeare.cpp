@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
-#include "../../include/SpaceDecl.h"
-#include "../../utls/include/Date.h"
+#include <SpaceDecl.h>
+#include <Date.h>
 
 #include <sys/time.h>
 
