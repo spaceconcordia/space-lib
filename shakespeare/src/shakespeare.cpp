@@ -6,13 +6,35 @@
 #include <cstdio>
 #include <ctime>
 #include <sstream>
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <cstring> // TODO use only string functions!!
+#include <stdio.h>
+#include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
+#include "../../include/SpaceDecl.h"
+#include "../../utls/include/Date.h"
 
 #include <sys/time.h>
 
-#define MAXFILESIZE 1024 // bytes
-#define EXTENSION   ".log"
+#define TIMEBUFFERSIZE  80
+#define READINGSIZE     4 // bytes
+#define PRIORITYSIZE    1 // byte
+#define SIZEOF_TIMET    8
+#define SIZEOF_UINT8T   1
+#define SIZEOF_INT      4
+#define BINARY_LOG_ENTRY_SIZE (SIZEOF_TIMET+SIZEOF_UINT8T+SIZEOF_UINT8T+SIZEOF_UINT8T) // timestamp, subsystem_id, priority_id, reading
+#define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
+
+#define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
+#define LOG_FILE_EXTENSION   ".log"
+#define LOG_ENTRY_DATE_POSITION 0
+#define LOG_ENTRY_SUBSYSTEM_POSITION sizeof(time_t)
+#define LOG_ENTRY_PRIORITY_POSITION (LOG_ENTRY_SUBSYSTEM_POSITION+sizeof(int))
+#define LOG_ENTRY_READING_POSITION (LOG_ENTRY_PRIORITY_POSITION+sizeof(int))
+        
+#define NULL_CHAR_POINTER 8
 
 using namespace std;
 namespace Shakespeare
@@ -27,8 +49,9 @@ namespace Shakespeare
     };
     string priorities[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
 
+    // TODO document
     char *get_custom_time(string format) {
-        char *buffer = (char *) malloc(sizeof(char) * 80);
+        char *buffer = (char *) malloc(TIMEBUFFERSIZE);
         time_t rawtime;
         struct tm * timeinfo;
         time (&rawtime);
@@ -37,24 +60,19 @@ namespace Shakespeare
         return buffer;
     }
 
-    // TODO open and close file, requires passing log file path
-    int log(FILE* lf, Priority ePriority, string process, string msg) {
-        if ( lf == NULL ) return 1;
-        fflush(lf);
-        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
-        return 0;
-    }
-
+    // check if a given file is at its size limit
+    // TODO deprecated since tgzWizard 
     int file_size_limit_reached(char *filepath) {
         struct stat st;
         stat(filepath, &st);
         size_t log_file_size = st.st_size;
-        if (MAXFILESIZE < log_file_size) {
+        if (CS1_MAX_LOG_FILE_SIZE < log_file_size) {
             return 1;
         }
         return 0;
     }
 
+    // check if a given directory exists using stat and return bool
     bool directory_exists(const char* directory) {
         struct stat st;
         if (stat(directory,&st) == 0) {
@@ -65,17 +83,22 @@ namespace Shakespeare
         return false;
     }
 
-    /* if filepath has spaces they must be escaped! */
-    string ensure_filepath(string folder)
+    // if filepath has spaces they must be escaped!
+    // function to validate filepath and create directory structure if missing
+    string ensure_filepath(string folder) 
     {
         //check if filepath exists, else create it
         if ( !directory_exists(folder.c_str()) ) {
-            printf ("%s Directory does not exist! Exiting... TODO create_directory! For now, replace space with underscore %s:%d \r\n",
-                    folder.c_str(), __FILE__,__LINE__);
-            //exit (EXIT_FAILURE);
+           printf ("%s Directory does not exist! Attempting to create it... %s:%d \r\n", 
+                    folder.c_str(), __FILE__,__LINE__);  
+          
+           int mkdir_result = mkdir(folder.c_str(),S_IRWXU);
+
+           if ( !directory_exists(folder.c_str()) || (mkdir_result != 0) ) {
+                   printf ("Failed creating path: %s! %s:%d",folder.c_str(), __FILE__,__LINE__);
+           }
         }
 
-        //printf("\nIncoming folder: %s\r\n",folder);
         // check for spaces and slashes
         if ( folder[folder.length()-1] != '/')
         {
@@ -86,18 +109,17 @@ namespace Shakespeare
         // check for spaces in the given filepath, replace with underscore
         for (i=0;i<(folder.length()-1);i++)
         {
-            //if (folder[i] == 0x20 || folder[i] == 0x09 || folder[i] == 0x0a || folder[i] == 0x0b || folder[i] == 0x0d)
             if ( isspace(folder[i]) )
             {
                folder[i] = '_'; // for now, replace with underscore. bad user.
             }
         }
-        //printf("\nOutgoing folder: %s\r\n",folder);
         return folder;
     }
 
-    //char *get_filename(string folder, string prefix, string suffix) {
-    string get_filename(string folder, string prefix, string suffix)
+
+    // TODO document
+    string get_filename(string folder, string prefix, string suffix) 
     {
         folder = ensure_filepath(folder);
 
@@ -115,9 +137,9 @@ namespace Shakespeare
                     directoryListing.push_back(entry->d_name);
                 }
             }
-        closedir(pDIR);
+            closedir(pDIR);
         }
-
+        
         int number = 0;
         char *buffer = Shakespeare::get_custom_time("%Y%m%d"); // new file every day
 
@@ -129,7 +151,7 @@ namespace Shakespeare
             size_t index = 0;
             bool copy = false;
 
-            while( index != last.length() ) {
+            while( index != last.length() ) { 
                 if (last[index] == '.') {
                     copy = !copy;
                 }
@@ -141,24 +163,119 @@ namespace Shakespeare
                 index += 1;
             }
             number = atoi(result.c_str());
-            number += 1;
+            number += 1; 
         }
         stringstream ss;//create a stringstream
-        //ss << number;//add number to the stream
         ss << buffer;//add stime to the stream
 
-        //char* filepath;
-        //filepath = malloc(folder.length()+prefix.length()+suffix.length()+1+4);
-        //return filepath;
         return folder + prefix + ss.str() + suffix;
     }
 
     /*
      * Function to provide shorthand to returning file pointer for
      * Shakespeare Log (SL) file
+     * TODO enforce NULL input pointer 
      */
     FILE * open_log(string folder,string process) {
-        FILE *LogFile = fopen(get_filename(folder, process, EXTENSION).c_str(),"a");
+        FILE *LogFile = fopen(get_filename(folder, process, LOG_FILE_EXTENSION).c_str(),"a");
         return LogFile;
+    }
+
+    // TODO document
+    // TODO open and close file, requires passing log file path
+    int log(FILE* lf, Priority ePriority, string process, string msg) {
+        if ( lf == NULL ) return CS1_NULL_FILE_POINTER;
+        fflush(lf);
+        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        return 0;
+    }
+
+    // faster method to make log entries
+    int log_shorthand(string log_folder, Priority logPriority, string process, string msg) {
+        FILE *test_log;
+        test_log = open_log(log_folder,process); 
+        int log_result=-1;
+        if(test_log!=NULL) {
+            log_result = Shakespeare::log(test_log, logPriority, process, msg);
+        }
+        fclose(test_log);
+        return log_result; 
+    }
+
+    /** Method to log a single integer to file as binary, which will 
+     *  support most logging needs
+     *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
+    */
+    int log_bin(FILE* lf, Priority ePriority, int process_id, int data) {
+        if (lf==NULL) return CS1_NULL_FILE_POINTER;
+        fflush(lf);
+        time_t itime;
+        time(&itime);
+        size_t elements_written = 0;
+        // TODO add deliminator for future validation
+        elements_written = elements_written + fwrite(&itime,        SIZEOF_TIMET, 1,lf);
+        elements_written = elements_written + fwrite(&process_id,   SIZEOF_UINT8T,1,lf); 
+        elements_written = elements_written + fwrite(&ePriority,    SIZEOF_UINT8T,1,lf);
+        elements_written = elements_written + fwrite(&data,         SIZEOF_UINT8T,1,lf);
+        fflush(lf);
+        //elements_written = elements_written + fwrite("\0", sizeof(char), 1,lf); // we know the length of a log entry
+        return (elements_written == 4) ? 0 : 1;
+    }
+
+    // struct to hold the parsed values of a binary log entry
+    typedef struct {
+        time_t 	date_time;
+        uint8_t subsystem;
+        uint8_t	priority;
+        uint8_t	data;
+    } BinaryLogEntry;
+
+    // Method to read an entry from a binary file
+    // @param string filename - the name of the file which stores binary log entries
+    // @param streampos entry_position - the position of the log entry to be read
+    // @return BinaryLogEntry - the BinaryLogEntry struct containing all pertinent data
+    //
+    // Our binary log entry size is always the same. Some error checking
+    // should be performed to ensure bytes received are expected and
+    // and in correct order    
+    // TODO current operation is dangerous and unreliable. A single missing byte will break all future log entry reading - use a delimination phrase between log entries, and scan accordingly
+    BinaryLogEntry read_bin_entry(string filename, streampos entry_position) {
+        Shakespeare::BinaryLogEntry log_entry;
+        static ifstream inputBinary;
+        inputBinary.open(filename.c_str(),ios_base::binary);
+        streampos abs_position = entry_position*BINARY_LOG_ENTRY_SIZE;
+        
+        // store EOF conditions
+        inputBinary.seekg(0,ios::end);
+        int file_size;
+        file_size = inputBinary.tellg();
+        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/BINARY_LOG_ENTRY_SIZE);
+
+        // seek back to beginning of file
+        inputBinary.seekg(0,ios::beg);
+        if (entry_position > 0) {// seek as required
+            inputBinary.seekg(abs_position);
+        }
+
+        // take a reading if boundary conditions are met
+        int cur_pos = inputBinary.tellg();
+        if ( file_size-cur_pos >= BINARY_LOG_ENTRY_SIZE) {
+            if (inputBinary) { // read and return log entry
+                inputBinary.read( (char*)&log_entry, sizeof(log_entry) );
+            }
+        }
+
+        // close and return
+        inputBinary.close();
+        return log_entry;
+    }
+
+    // print a binary log entry in a human-readable form
+    void print_binary_entry(FILE * output_file, BinaryLogEntry entry) {
+        Date time(entry.date_time,1);
+        fprintf ( output_file,
+            "Time:%s Subsystem:%d Priority:%s Value:%d\n",
+            time.GetDateTimeString(), entry.subsystem, priorities[entry.priority].c_str(), entry.data
+        );
     }
 }

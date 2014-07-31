@@ -66,11 +66,32 @@
 
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
+#define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
+
 
 // From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */
 #define CS1_PATH_MAX PATH_MAX           /* 4096 chars in a path name including nul */
 
+// Subsystem IDs
+//#define ACS          0x00
+//#define COMMS        0x01
+//#define HARDWARE     0x02
+//#define MECH         0x03
+//#define PAYLOAD      0x04
+//#define POWER        0x05
+//#define SOFTWARE     0x06
+//#define UPDATER      0x07
+//#define WATCH_PUPPY  0x08
+//#define UNDEF_SUB    0xFF
+// Software Subsystem IDs for logging purposes
+#define COMMANDER_LOG_ID 	0x10
+#define BABYCRON_LOG_ID 	0x11
+#define UPDATER_API_ID 		0x12
+#define NETMAN_LOG_ID 		0x13
+#define JOBRUNNER_LOG_ID 	0x14
+#define TIMER_LIB_ID 		0x15
+#define SHAKESPEARE_LIB_ID 	0x16
 #ifndef CS1_UTEST 
 #define NDEBUG              /* disable assertion (assert.h) in production version */
 #endif
@@ -83,6 +104,7 @@
 #define CS1_NULL_MALLOC             7
 #define CS1_INVALID_BYTE_SEQUENCE   13
 #define CS1_WRONG_LENGTH            14
+#define CS1_NULL_FILE_POINTER       21
 
 // Transceiver error codes
 #define HE_FAILED_OPEN_PORT         8
