@@ -3,14 +3,9 @@
 #include "../../include/SpaceDecl.h"
 #include <stdint.h>
 #define PROCESS "GTEST"
-#define BE 1
-#define LE 0
 #define TIMEBUFFERSIZE  80
 #define READINGSIZE     4 // bytes
 #define PRIORITYSIZE    1 // byte
-#define SIZEOF_TIMET    8
-#define SIZEOF_UINT8T   1
-#define SIZEOF_INT      4
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
 #define BINARY_LOG_ENTRY_SIZE 11
 #define TEST_LOG_PATH "/tmp/shakespeare_testing"
@@ -41,8 +36,6 @@ char endian(void)
   return(*(char *)&x);
 }
 
-#define isBigEndian (endian()==BE)
-#define isLittleEndian (endian()==LE)
 
 TEST_F(Shakespeare_Test, LittleEndian)
 {

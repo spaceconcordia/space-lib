@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
-#include "../../include/SpaceDecl.h"
-#include "../../utls/include/Date.h"
+#include <SpaceDecl.h>
+#include <Date.h>
 
 #include <sys/time.h>
 
@@ -121,12 +121,12 @@ namespace Shakespeare
     // TODO document
     string get_filename(string folder, string prefix, string suffix) 
     {
-        folder = ensure_filepath(folder);    
-        
+        folder = ensure_filepath(folder);
+
         DIR *pDIR;
         struct dirent *entry;
         vector<string> directoryListing;
-        
+
         if( ( pDIR = opendir(folder.c_str()) ) )
         {
             while( ( entry = readdir(pDIR) ) )
@@ -143,8 +143,8 @@ namespace Shakespeare
         int number = 0;
         char *buffer = Shakespeare::get_custom_time("%Y%m%d"); // new file every day
 
-        if (directoryListing.size() > 0) 
-        { 
+        if (directoryListing.size() > 0)
+        {
             sort(directoryListing.begin(), directoryListing.end());
             string last = directoryListing.back();
             string result;
@@ -155,7 +155,7 @@ namespace Shakespeare
                 if (last[index] == '.') {
                     copy = !copy;
                 }
-                else {        
+                else {
                     if (copy) {
                         result += last[index];
                     }
@@ -172,7 +172,7 @@ namespace Shakespeare
     }
 
     /*
-     * Function to provide shorthand to returning file pointer for 
+     * Function to provide shorthand to returning file pointer for
      * Shakespeare Log (SL) file
      * TODO enforce NULL input pointer 
      */
