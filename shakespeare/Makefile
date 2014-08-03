@@ -8,7 +8,7 @@ SHAREDMICROFLAGS = $(MICROFLAGS) -fPIC -shared
 DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
 GLOBAL_INC_PATH=../../include/
 INCPATH=-I./inc/ -I$(GLOBAL_INC_PATH)
-LIBPATH=-L./lib/ -I../../lib/
+LIBPATH=-L./lib/ -L../lib/
 
 HEADERS=$(USER_DIR)/inc/timer.h $(UTLS_DIR)/include/Date.h $(GLOBAL_INC_DIR)/SpaceDecl.h $(USER_DIR)/inc/SC_he100.h
 

@@ -4,6 +4,7 @@
 **/*.x
 **/*.log
 **/*.swp
+**/*.swo
 shakespeare_test
 shakespeare.h
 fletcher.h

@@ -105,19 +105,6 @@
 #define CS1_INVALID_BYTE_SEQUENCE   13
 #define CS1_WRONG_LENGTH            14
 #define CS1_NULL_FILE_POINTER       21
+#define CS1_NULL_POINTER            77
 
-// Transceiver error codes
-#define HE_FAILED_OPEN_PORT         8
-#define HE_FAILED_CLOSE_PORT        9
-#define HE_NOT_A_TTY                10
-#define HE_INVALID_COMMAND          15
-#define HE_NOT_READY                16
-#define HE_POWER_OFF                17
-#define HE_FAILED_TTY_CONFIG        18
-#define HE_FAILED_SET_BAUD          19
-#define HE_FAILED_FLUSH             20
-#define HE_FAILED_CHECKSUM          21
-#define HE_FAILED_NACK              22
-#define HE_INVALID_BYTE_SEQUENCE    23
-#define HE_EMPTY_RESPONSE           24
 #endif
