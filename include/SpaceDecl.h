@@ -107,11 +107,13 @@
 #define COMMANER_SLEEP_TIME 1       // seconds
 
 // General error codes
-#define CS1_SUCCESS                 0
-#define CS1_NULL_MALLOC             7
-#define CS1_INVALID_BYTE_SEQUENCE   13
-#define CS1_WRONG_LENGTH            14
-#define CS1_NULL_FILE_POINTER       21
-#define CS1_NULL_POINTER            77
+#define CS1_SUCCESS                     0
+#define CS1_NULL_MALLOC                 7
+#define CS1_INVALID_BYTE_SEQUENCE       13
+#define CS1_WRONG_LENGTH                14
+#define CS1_NULL_FILE_POINTER           21
+#define CS1_NULL_POINTER                77
+#define CS1_DIRECTORY_DOES_NOT_EXIST    78
+#define CS1_FILE_DOES_NOT_EXIST         79
 
 #endif
