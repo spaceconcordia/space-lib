@@ -22,13 +22,14 @@
 #include "shakespeare.h"
 
 #define PROCESS "TestProc"
+#define LOG_PATH "/home/logs/shakespeare_testing"
 
 using namespace std;
 
 int main() {
 
     FILE *test_log;
-    test_log = Shakespeare::open_log("/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder",PROCESS);
+    test_log = Shakespeare::open_log(LOG_PATH,PROCESS);
 
     Shakespeare::Priority logPriority = Shakespeare::DEBUG; //enum
     string result = "Some useful debug information";
@@ -41,4 +42,5 @@ int main() {
         Shakespeare::log(test_log, Shakespeare::CRITICAL, PROCESS, "This is a critical message");
     }
     fclose(test_log);
+    Shakespeare::log_shorthand(LOG_PATH, logPriority, PROCESS, "LOG SHORTHAND");
 }

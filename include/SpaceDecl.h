@@ -68,6 +68,13 @@
 #define CS1_MAX_FRAME_SIZE 190
 #define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
 
+#define BE 1
+#define LE 0
+#define isBigEndian (endian()==BE)
+#define isLittleEndian (endian()==LE)
+#define SIZEOF_TIMET    8
+#define SIZEOF_UINT8T   1
+#define SIZEOF_INT      4
 
 // From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */
@@ -100,24 +107,13 @@
 #define COMMANER_SLEEP_TIME 1       // seconds
 
 // General error codes
-#define CS1_SUCCESS                 0
-#define CS1_NULL_MALLOC             7
-#define CS1_INVALID_BYTE_SEQUENCE   13
-#define CS1_WRONG_LENGTH            14
-#define CS1_NULL_FILE_POINTER       21
+#define CS1_SUCCESS                     0
+#define CS1_NULL_MALLOC                 7
+#define CS1_INVALID_BYTE_SEQUENCE       13
+#define CS1_WRONG_LENGTH                14
+#define CS1_NULL_FILE_POINTER           21
+#define CS1_NULL_POINTER                77
+#define CS1_DIRECTORY_DOES_NOT_EXIST    78
+#define CS1_FILE_DOES_NOT_EXIST         79
 
-// Transceiver error codes
-#define HE_FAILED_OPEN_PORT         8
-#define HE_FAILED_CLOSE_PORT        9
-#define HE_NOT_A_TTY                10
-#define HE_INVALID_COMMAND          15
-#define HE_NOT_READY                16
-#define HE_POWER_OFF                17
-#define HE_FAILED_TTY_CONFIG        18
-#define HE_FAILED_SET_BAUD          19
-#define HE_FAILED_FLUSH             20
-#define HE_FAILED_CHECKSUM          21
-#define HE_FAILED_NACK              22
-#define HE_INVALID_BYTE_SEQUENCE    23
-#define HE_EMPTY_RESPONSE           24
 #endif
