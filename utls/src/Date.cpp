@@ -90,21 +90,11 @@ Date::Date(time_t raw_time, int precision){
     }
 }
 
-const char * GetCustomFormatTime(time_t rawtime, std::string format, int moreminutes) {
+int Date::GetCustomFormatTime(std::string format, char * output_date, int output_length, time_t rawtime) {
     char buffer[80] = {0};
     struct tm * timeinfo;
-    time (&rawtime);
     timeinfo = localtime(&rawtime);
-    timeinfo->tm_min = timeinfo->tm_min + moreminutes;
-    if ( (timeinfo->tm_min + moreminutes) > 59 ) { 
-        timeinfo->tm_hour++;
-        timeinfo->tm_min = 0 + ( moreminutes - (60-timeinfo->tm_min));
-    }   
-    else {
-        timeinfo->tm_min = timeinfo->tm_min + moreminutes;
-    }   
-    strftime(buffer,80,format.c_str(),timeinfo);
-    return buffer;
+    return strftime(buffer,output_length,format.c_str(),timeinfo);
 }  
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -129,9 +119,12 @@ void Date::MakeTimeT(void){
     struct tm timeinfo;
     memset (&timeinfo, 0, sizeof(tm)); // to clear warning against missing initializer for timeinfo.*
 
-    timeinfo.tm_year = this->year - 1900;
-    timeinfo.tm_mon  = this->month - 1;
-    timeinfo.tm_mday = this->day;
+    timeinfo.tm_year    = this->year - 1900;
+    timeinfo.tm_mon     = this->month - 1;
+    timeinfo.tm_mday    = this->day;
+    timeinfo.tm_hour    = this->hour;
+    timeinfo.tm_min     = this->minute;
+    timeinfo.tm_sec     = this->second;
 
     this->time_t_format =  mktime(&timeinfo);
 }

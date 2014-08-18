@@ -33,7 +33,7 @@ class Date {
         Date(time_t raw_time);
         Date(time_t raw_time, int precision);
 
-        const char * GetCustomFormatTime(time_t rawtime, std::string format, int moreminutes);
+        int GetCustomFormatTime(std::string format, char * output_date, int output_length, time_t rawtime);
 
         time_t GetTimeT(void);
         const char* GetString(void); // When the object is destroyed, the memory location is deallocated, make a copy!
