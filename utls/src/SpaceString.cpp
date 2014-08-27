@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "SpaceDecl.h"
 #include "SpaceString.h"
-
+#include <time.h>
 size_t SpaceString::getUInt(const char cstr[4])
 {
 
@@ -25,6 +25,27 @@ char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
     }
 
     memcpy(char_buf, converter.cstr, 4);
+
+    return char_buf;
+}
+time_t SpaceString::getTimet(const char cstr[8])
+{
+    Converter_timet_8char converter = {0};
+    if (cstr){
+        memcpy(converter.cstr,cstr,8);
+    }
+
+    return converter.time;
+}
+char* SpaceString::get8Char(char char_buf[8], time_t time)
+{
+    Converter_timet_8char converter = {0};
+
+    if (char_buf){
+        converter.time = time;
+    }
+
+    memcpy(char_buf, converter.cstr, 8);
 
     return char_buf;
 }
