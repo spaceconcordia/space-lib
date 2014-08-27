@@ -19,8 +19,12 @@
 #define SYSTEMPROCESS_H
 
 class SystemProcess {
+    private :
+        char * command;
+
     public :
-        std::string Execute(char * executable);
+        SystemProcess(char * command);
+        std::string Execute();
 };
 
 #endif /* !SYSTEMPROCESS_H */

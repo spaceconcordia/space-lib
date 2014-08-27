@@ -46,7 +46,7 @@ OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q
 #
 # CppUTest files, no wildcard, add files explicitly!
 #
-UNIT_TEST = tests/utl-test.cpp
+UNIT_TEST = tests/utl-test.cpp tests/SystemProcessTest.cpp
 CS1_UTEST_DIR="cs1_utest" # as defined in SpaceDecl.h
 
 #
@@ -64,7 +64,7 @@ lib/libcs1_utls.a: $(OBJECTS)
 	ar rcs $@ $^
 
 bin/%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO)  $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
+	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
 
 bin/fileIO.o: $(SPACE_UPTDATER)/src/fileIO.cpp $(SPACE_UPTDATER)/include/fileIO.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV)
@@ -97,13 +97,12 @@ bin/dirUtlQ6.o: $(SPACE_SCRIPT)/tgz-wizard/src/dirUtl.cpp $(SPACE_SCRIPT)/tgz-wi
 test: mk_local_dir bin/AllTests 
 	mkdir -p $(CS1_UTEST_DIR)
 
-bin/AllTests: tests/AllTests.cpp  $(UNIT_TEST) $(OBJECTS) 
+bin/AllTests: tests/AllTests.cpp $(UNIT_TEST) $(OBJECTS) 
 	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) $(LIBPATH) -o $@ $^ $(CPPUTEST_LIBS) $(ENV)
 
 mk_local_dir:
 	mkdir -p lib bin
 
-#
 #
 #++++++++++++++++++++
 # Cleanup

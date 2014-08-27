@@ -21,15 +21,19 @@
 #define MAX_COMMAND_LENGTH 255
 #define MAX_OUTPUT_LENGTH 255
 
+SystemProcess::SystemProcess(char * command) {
+    this->command=command;
+}
+
 /**
  * Function to execute a command and get output
  */
-std::string SystemProcess::Execute(char * orig_cmd) {
-  char command[MAX_COMMAND_LENGTH] = {0};
-  sprintf(command, orig_cmd, "2>&1"); // redirect stderr to stdout
-  
+std::string SystemProcess::Execute() {
+  sprintf(command, this->command, "2>&1"); // redirect stderr to stdout
   FILE * exec_pipe = popen(command, "r");
-  if (!exec_pipe) return "[ERROR] failed to open pipe";
+  if (!exec_pipe) {
+    return "[ERROR] failed to open pipe";
+  }
   char buffer[MAX_OUTPUT_LENGTH];
   std::string result = "";
   while( !feof(exec_pipe) ) {
