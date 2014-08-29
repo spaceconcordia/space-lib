@@ -22,7 +22,7 @@
  *
  * NAME : getUInt
  * 
- * PURPOSE : 
+ * PURPOSE : Converts a 4 byte char sequence to an unsigned integer
  *
  *-----------------------------------------------------------------------------*/
 size_t SpaceString::getUInt(const char cstr[4])
@@ -40,7 +40,7 @@ size_t SpaceString::getUInt(const char cstr[4])
  *
  * NAME : get4Char
  * 
- * PURPOSE : 
+ * PURPOSE : Converts an unsigned integer to a 4 byte char sequence
  *
  *-----------------------------------------------------------------------------*/
 char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
@@ -60,7 +60,7 @@ char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
  *
  * NAME : getTimet
  * 
- * PURPOSE : 
+ * PURPOSE : Converts an 8 byte char sequence to time_t
  *
  *-----------------------------------------------------------------------------*/
 time_t SpaceString::getTimet(const char cstr[8])
@@ -77,7 +77,7 @@ time_t SpaceString::getTimet(const char cstr[8])
  *
  * NAME : get8Char 
  * 
- * PURPOSE : 
+ * PURPOSE : Converts time_t to an 8 byte char sequence 
  *
  *-----------------------------------------------------------------------------*/
 char* SpaceString::get8Char(char char_buf[8], time_t time)
