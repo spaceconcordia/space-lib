@@ -1,12 +1,32 @@
-
+/******************************************************************************
+ *
+ * CREATOR : Space Concordia 2014, Joseph 
+ *
+ * TITLE : SpaceString.cpp
+ *
+ * REVISION HISTORY :
+ *
+ *      - 2014-08-29 Joseph : Uniformize style... Short lines to avoid 
+ *                            wrap around, opening brack of functions on
+ *                            its own line, function headers
+ *          
+ *
+ *****************************************************************************/
 #include <assert.h>
 #include <stdio.h>
+#include <time.h>
 #include "SpaceDecl.h"
 #include "SpaceString.h"
-#include <time.h>
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * NAME : getUInt
+ * 
+ * PURPOSE : 
+ *
+ *-----------------------------------------------------------------------------*/
 size_t SpaceString::getUInt(const char cstr[4])
 {
-
     Converter_uint_4char converter = {0};
 
     if (cstr) {
@@ -16,6 +36,13 @@ size_t SpaceString::getUInt(const char cstr[4])
     return converter.uint;
 }
 
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * NAME : get4Char
+ * 
+ * PURPOSE : 
+ *
+ *-----------------------------------------------------------------------------*/
 char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
 {
     Converter_uint_4char converter = {0};    
@@ -28,6 +55,14 @@ char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
 
     return char_buf;
 }
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * NAME : getTimet
+ * 
+ * PURPOSE : 
+ *
+ *-----------------------------------------------------------------------------*/
 time_t SpaceString::getTimet(const char cstr[8])
 {
     Converter_timet_8char converter = {0};
@@ -37,6 +72,14 @@ time_t SpaceString::getTimet(const char cstr[8])
 
     return converter.time;
 }
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * NAME : get8Char 
+ * 
+ * PURPOSE : 
+ *
+ *-----------------------------------------------------------------------------*/
 char* SpaceString::get8Char(char char_buf[8], time_t time)
 {
     Converter_timet_8char converter = {0};
@@ -51,13 +94,13 @@ char* SpaceString::get8Char(char char_buf[8], time_t time)
 }
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-*
-* NAME : BuildPath 
-* 
-* PURPOSE : Builds a path 'dir/file' and saves it into 'path_buf', the caller
-*           has to make sure path_buf is large enough.
-*
-*-----------------------------------------------------------------------------*/
+ *
+ * NAME : BuildPath 
+ * 
+ * PURPOSE : Builds a path 'dir/file' and saves it into 'path_buf', the caller
+ *           has to make sure path_buf is large enough.
+ *
+ *-----------------------------------------------------------------------------*/
 char* SpaceString::BuildPath(char *path_buf, const char *dir, const char *file)
 {
     assert(strlen(dir) + strlen(file) + 1 < CS1_PATH_MAX);
@@ -68,5 +111,3 @@ char* SpaceString::BuildPath(char *path_buf, const char *dir, const char *file)
 
     return path_buf;
 }
-
-
