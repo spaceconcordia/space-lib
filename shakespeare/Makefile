@@ -6,11 +6,15 @@ BEAGLECC=arm-linux-gnueabi-g++
 MICROCFLAGS=-mcpu=v8.40.b -mxl-barrel-shift -mxl-multiply-high -mxl-pattern-compare -mno-xl-soft-mul -mno-xl-soft-div -mxl-float-sqrt -mhard-float -mxl-float-convert -mlittle-endian
 SHAREDMICROFLAGS = $(MICROFLAGS) -fPIC -shared
 DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
-GLOBAL_INC_PATH=../include/
-INCPATH=-I./inc/ -I$(GLOBAL_INC_PATH)
-LIBPATH=-L./lib/ -L../lib/
+
+GLOBAL_INC_PATH=../include
+INCPATH=-I./inc -I$(GLOBAL_INC_PATH)
+LIBPATH=-L./lib -L../lib
 
 HEADERS=$(GLOBAL_INC_PATH)/SpaceDecl.h $(GLOBAL_INC_PATH)/Date.h
+
+example: src/example.cpp 
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) $< -o $@  -lshakespeare -lcs1_utls
 
 buildX86Static: $(HEADERS) src/shakespeare.cpp
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c -lcs1_utls src/shakespeare.cpp -o lib/shakespeare.o
@@ -23,4 +27,4 @@ buildQ6Shared: $(HEADERS) src/shakespeare.cpp
 buildBBStatic: $(HEADERS) src/shakespeare.cpp
 	$(BEAGLECC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-BB.o
 clean:
-	rm -f lib/* *.o *.a
+	rm -f lib/* *.o *.a example
