@@ -22,7 +22,7 @@
 #define MAX_OUTPUT_LENGTH 255
 
 SystemProcess::SystemProcess(char * command) {
-    this->command=command;
+  this->command=command;
 }
 
 /**
