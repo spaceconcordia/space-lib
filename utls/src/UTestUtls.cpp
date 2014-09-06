@@ -1,16 +1,16 @@
 /******************************************************************************
-*
-* AUTHOR :
-*
-* FILE : UTestUtls.cpp
-*
-* PURPOSE :
-*
-* CREATION DATE : 05-07-2014
-*
-* LAST MODIFIED : Sat 05 Jul 2014 08:43:23 PM EDT
-*
-******************************************************************************/
+ *
+ * AUTHOR : Joseph, Space Concordia 2014
+ *
+ * FILE : UTestUtls.cpp
+ *
+ * PURPOSE : Provides functions that are usefull in Unit Testing.
+ *
+ * CREATION DATE : 05-07-2014
+ *
+ * LAST MODIFIED : Fri 29 Aug 2014 11:42:43 AM EDT
+ *
+ ******************************************************************************/
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -25,7 +25,7 @@
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * NAME : create_file
+ * NAME : CreateFile 
  *
  * PURPOSE : Conviently create test files.
  * 
@@ -46,6 +46,13 @@ bool UTestUtls::CreateFile(const char* path, const char* msg)
 }
 
 
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * NAME : CreateFileOfSize
+ *
+ * PURPOSE : Conviently create test files of a specified size.
+ * 
+ *-----------------------------------------------------------------------------*/
 bool UTestUtls::CreateFileOfSize(const char* path, size_t size)
 {
     int status_size = 0;

@@ -4,6 +4,7 @@
 **/*.x
 **/*.log
 **/*.swp
+*swp
 **/*.swo
 shakespeare_test
 shakespeare.h
@@ -18,3 +19,4 @@ lib/* !lib/README.txt
 shakespeare/lib
 utls/bin
 utls/lib
+checksum/lib
