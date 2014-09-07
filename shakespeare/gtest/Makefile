@@ -17,12 +17,11 @@
 GTEST_DIR = ../../../gtest-1.7.0
 
 # Where to find user code.
-USER_DIR=../
+USER_DIR=..
 UTLS_DIR=../../../space-lib/utls
-INCPATH=-I../inc/
-GLOBALINCPATH=-I../../include/
-LIBPATH=-I../lib/
-GLOBALLIBPATH=-I../../lib/
+INCPATH=../inc/
+GLOBALINCPATH=../../include
+LIBPATH=-L$(UTLS_DIR)/lib
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -75,17 +74,17 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 ###########################
 
-GLOBAL_INC_PATH=../../include/
-HEADERS=$(GLOBAL_INC_PATH)/SpaceDecl.h $(GLOBAL_INC_PATH)/Date.h $(USER_DIR)/inc/shakespeare.h
+INCLUDE_PATHS=-I$(GLOBALINCPATH) -I$(UTLS_DIR)/include -I$(INCPATH)
+HEADERS=$(GLOBALINCPATH)/SpaceDecl.h $(UTLS_DIR)/include/Date.h $(USER_DIR)/inc/shakespeare.h
 
 shakespeare.o : $(USER_DIR)/src/shakespeare.cpp $(HEADERS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(GLOBALINCPATH) -I$(USER_DIR)/inc/ $(CXXFLAGS) -c $(USER_DIR)/src/shakespeare.cpp 
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) -I$(USER_DIR)/inc/ $(CXXFLAGS) -c $(USER_DIR)/src/shakespeare.cpp 
 
 Date.o : $(UTLS_DIR)/src/Date.cpp $(UTLS_DIR)/include/Date.h $(HEADERS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(GLOBALINCPATH) -I$(UTLS_DIR)/include/ $(CXXFLAGS) -c $(UTLS_DIR)/src/Date.cpp
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(UTLS_DIR)/src/Date.cpp
 
-shakespeare_test : shakespeare.o Date.o shakespeare_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(GLOBALINCPATH) $(CXXFLAGS) -lpthread $^ -o $@ -lrt
+shakespeare_test : shakespeare.o shakespeare_test.o gtest_main.a
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) $(LIBPATH) -lpthread $^ -o $@ -lrt -lcs1_utls
 
-shakespeare_test.o : $(USER_DIR)/gtest/shakespeare_test.cpp $(USER_DIR)/inc/shakespeare.h $(HEADERS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(GLOBALINCPATH) $(CXXFLAGS) -c $(USER_DIR)/gtest/shakespeare_test.cpp
+shakespeare_test.o : $(USER_DIR)/gtest/shakespeare_test.cpp $(HEADERS) $(GTEST_HEADERS)
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(USER_DIR)/gtest/shakespeare_test.cpp
