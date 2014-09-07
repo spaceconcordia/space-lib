@@ -19,17 +19,6 @@ class Shakespeare_Test : public ::testing::Test
     //FILE *test_log;
 };
 
-/* 
-// Some test 
-TEST_F(Shakespeare_Test, SomeTest)
-{
-    ASSERT_EQ(
-        'a', // expected
-        'b'  // actual
-    ); 
-}
-*/
-
 char endian(void)
 {
   short x=0x0100;
