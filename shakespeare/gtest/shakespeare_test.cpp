@@ -139,12 +139,14 @@ TEST_F(Shakespeare_Test, Binary)
             string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
             Shakespeare::BinaryLogEntry logEntry;
             logEntry = Shakespeare::read_bin_entry(filename,i);
-            /*
+           
+            #ifdef CS1_DEBUG
             printf (
                 "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
                 BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
             );
-            */
+            #endif
+            
             print_binary_entry(stdout, logEntry);
             //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
             ASSERT_EQ(test_subsystem,logEntry.subsystem); 

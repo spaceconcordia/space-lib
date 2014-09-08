@@ -84,7 +84,7 @@ Date.o : $(UTLS_DIR)/src/Date.cpp $(UTLS_DIR)/include/Date.h $(HEADERS) $(GTEST_
 	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(UTLS_DIR)/src/Date.cpp
 
 shakespeare_test : shakespeare.o shakespeare_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) $(LIBPATH) -lpthread $^ -o $@ -lrt -lcs1_utls
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) $(LIBPATH) -lpthread $^ -o $@ -lrt -lcs1_utls -DCS1_DEBUG
 
 shakespeare_test.o : $(USER_DIR)/gtest/shakespeare_test.cpp $(HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(USER_DIR)/gtest/shakespeare_test.cpp
