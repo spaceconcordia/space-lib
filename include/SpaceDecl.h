@@ -108,6 +108,7 @@
 
 // General error codes
 #define CS1_SUCCESS                     0
+#define CS1_FAILURE                     1
 #define CS1_NULL_MALLOC                 7
 #define CS1_INVALID_BYTE_SEQUENCE       13
 #define CS1_WRONG_LENGTH                14
