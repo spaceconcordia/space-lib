@@ -8,13 +8,11 @@ SHAREDMICROFLAGS = $(MICROFLAGS) -fPIC -shared
 DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
 
 GLOBAL_INC_PATH=../include
-INCPATH=-I./inc -I$(GLOBAL_INC_PATH)
+SPACE_LIB_PATH=../
+INCPATH=-I./inc -I$(GLOBAL_INC_PATH) -I$(SPACE_LIB_PATH)/utls/include
 LIBPATH=-L./lib -L../lib
 
-HEADERS=$(GLOBAL_INC_PATH)/SpaceDecl.h $(GLOBAL_INC_PATH)/Date.h
-
-example: src/example.cpp 
-	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) $< -o $@  -lshakespeare -lcs1_utls
+HEADERS=$(GLOBAL_INC_PATH)/SpaceDecl.h $(SPACE_LIB_PATH)/utls/include/Date.h
 
 buildX86Static: $(HEADERS) src/shakespeare.cpp
 	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -c -lcs1_utls src/shakespeare.cpp -o lib/shakespeare.o
@@ -26,5 +24,9 @@ buildQ6Shared: $(HEADERS) src/shakespeare.cpp
 	$(MICROPP) $(CFLAGS) $(SHAREDMICROFLAGS) $(INCPATH) $(LIBPATH) -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-mbcc.o
 buildBBStatic: $(HEADERS) src/shakespeare.cpp
 	$(BEAGLECC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) -static -lcs1_utls -c src/shakespeare.cpp -o lib/shakespeare-BB.o
+	
+example: src/example.cpp 
+	$(CC) $(CFLAGS) $(INCPATH) $(LIBPATH) $(DEBUGFLAGS) $< -o $@  -lshakespeare -lcs1_utls
+
 clean:
 	rm -f lib/* *.o *.a example
