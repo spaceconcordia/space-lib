@@ -1,14 +1,12 @@
-/*=============================================================================
-*
-*   FILE        : SpaceDecl.h
-*
-*   AUTHOR      : Space Concordia 2014 
-*
-*   PURPOSE     : This header contains Global Symbols. Always include BEFORE
-*                 other includes.
-*
-*
-*============================================================================*/
+/******************************************************************************
+ *
+ *   FILE        : SpaceDecl.h
+ *
+ *   AUTHOR      : Space Concordia 2014 
+ *
+ *   PURPOSE     : This header contains Global Symbols. 
+ *
+ *****************************************************************************/
 #ifndef SPACE_CONCORDIA_DECL_H
 #define SPACE_CONCORDIA_DECL_H
 
@@ -26,7 +24,7 @@
 #define CS1_PIDS            "/home/pids"
 #define CS1_TMP             "/tmp"
 
-
+#define NDEBUG              /* disable assertion (assert.h) in production version */
 
 #ifdef CS1_UTEST 
 /* add -DCS1_UTEST to the ENV flag in the makefile to activate the test environment */
@@ -37,7 +35,7 @@
  * instead create/populate directories on the fly.
  * Define -DCS1_UTEST in makefile and create/remove test directories in setup()/teardown() 
  */
-// Base directories
+
 #define CS1_UTEST_DIR       "cs1_utest"             // Create this directory within the makefile
                                                     // Create all others within setup() of your tests
 #undef CS1_LOGS
@@ -49,7 +47,9 @@
 #undef CS1_TMP
 #define CS1_TMP             CS1_UTEST_DIR
 
-#endif
+#undef NDEBUG                                       // enable assertions
+#endif // CS1_UTEST
+
 
 // Files
 #define CS1_WATCH_PUPPY_PID CS1_PIDS"/watch-puppy.pid"
@@ -109,9 +109,6 @@
 #define JOBRUNNER_LOG_ID 	0x14
 #define TIMER_LIB_ID 		0x15
 #define SHAKESPEARE_LIB_ID 	0x16
-#ifndef CS1_UTEST 
-#define NDEBUG              /* disable assertion (assert.h) in production version */
-#endif
 
 // Commander Config
 #define COMMANER_SLEEP_TIME 1       // seconds
