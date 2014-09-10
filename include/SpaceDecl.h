@@ -71,9 +71,6 @@
 #define LE 0
 #define isBigEndian (endian()==BE)
 #define isLittleEndian (endian()==LE)
-#define SIZEOF_TIMET    8
-#define SIZEOF_UINT8T   1
-#define SIZEOF_INT      4
 
 // From limits.h
 #define CS1_NAME_MAX NAME_MAX           /* 255 chars in a file name */

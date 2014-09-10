@@ -7,7 +7,7 @@
 #define READINGSIZE     4 // bytes
 #define PRIORITYSIZE    1 // byte
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
-#define BINARY_LOG_ENTRY_SIZE 11
+#define BINARY_LOG_ENTRY_SIZE 12
 #define TEST_LOG_PATH "/tmp/shakespeare_testing"
 
 class Shakespeare_Test : public ::testing::Test
@@ -31,45 +31,39 @@ TEST_F(Shakespeare_Test, LittleEndian)
   ASSERT_EQ(LE,endian());
 }
 
-TEST_F(Shakespeare_Test, TypeTest)
-{
-  ASSERT_EQ(SIZEOF_TIMET,sizeof(time_t));
-  ASSERT_EQ(SIZEOF_UINT8T,sizeof(uint8_t));
-  ASSERT_EQ(SIZEOF_INT,sizeof(int));
-  ASSERT_EQ(BINARY_LOG_ENTRY_SIZE,COMPILER_CALCULATED_LOG_ENTRY_SIZE);
-}
-
-// EnsureFilePath 
 // Make sure space is replaced with underscore, and slash is added
-TEST_F(Shakespeare_Test, EnsureFilepath)
+TEST_F(Shakespeare_Test, CharacterReplacement)
 {    
-    string actual_filepath = Shakespeare::ensure_filepath("/media/Data/Development/CONSAT1/space-lib/shakespeare/test folder");
-    string expected_filepath = "/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder/";
+    string actual_filepath = Shakespeare::ensure_filepath("/tmp/test folder");
+    string expected_filepath = "/tmp/test_folder/";
     ASSERT_STREQ( 
         expected_filepath.c_str(), // expected
         actual_filepath.c_str()  // actual
     ); 
 }
 
-// GetFilename
 // Test filename and path construction
-// TODO WHAT ELSE?
 TEST_F(Shakespeare_Test, GetFilename)
 {
     string process = "TestProc";
     string extension = ".log";
     stringstream ss; 
-    string folder = "/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder/";
+    string folder = "/tmp/test_folder/";
     char *buffer = Shakespeare::get_custom_time("%Y%m%d"); 
     ss << buffer;
     string expected_file = folder + process + ss.str() + extension;
 
-    string actual_file = Shakespeare::get_filename("/media/Data/Development/CONSAT1/space-lib/shakespeare/test folder", process, extension);
+    string actual_file = Shakespeare::get_filename("/tmp/test folder", process, extension);
 
     ASSERT_STREQ(
         expected_file.c_str(), // expected
         actual_file.c_str()  // actual
     ); 
+
+    ASSERT_EQ(
+        true,
+        Shakespeare::directory_exists(folder.c_str())
+    );
 }
 
 /*
@@ -84,7 +78,6 @@ TEST_F(Shakespeare_Test, GetCustomDate)
 }
 */
 
-// Directory exists
 // Make sure there are no false positives or false negative
 // TODO test a REALLY long filepath
 TEST_F(Shakespeare_Test, DirectoryExists)
