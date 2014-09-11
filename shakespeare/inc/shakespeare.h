@@ -3,6 +3,12 @@
 
 #include <string>
 #include <stdint.h>
+
+#include "SpaceDecl.h"
+
+// Wrapper to the Shakespeare::log function 
+#define log_3(priority, process, msg) log_shorthand(string(CS1_LOGS), priority, process, msg)
+
 using namespace std;
 namespace Shakespeare
 {
