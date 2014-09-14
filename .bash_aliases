@@ -99,8 +99,20 @@ if [ $? -eq 0 ]; then \
   else \
     # @5 - Changes to working tree
     echo "'$IRed'"$(__git_ps1 " {%s}"); \
-  fi) '$BYellow$PathShort$Color_Off'\$ "; \
+  fi) '$BBlue$PathShort$Color_Off'\$ "; \
 else \
   # @2 - Prompt when not in GIT repo
-  echo " '$Yellow$PathShort$Color_Off'\$ "; \
+  echo " '$Blue$PathShort$Color_Off'\$ "; \
 fi)'
+
+CS1DIR="/media/Data/Development/Space/CONSAT1"
+alias sshsync='rsync -aEvz -e ssh'
+alias psgrep='ps aux | grep'
+alias supgrade='sudo apt-get update && sudo apt-get -y dist-upgrade'
+alias cshe='cd $CS1DIR/HE100-lib/C'
+alias cslib='cd $CS1DIR/space-lib'
+alias cscmd='cd $CS1DIR/space-commander'
+alias csjobs='cd $CS1DIR/space-jobs'
+alias csscript='cd $CS1DIR/space-script'
+alias cs1='cd $CS1DIR'
+alias netmusic='192.168.1.167:/export/Music'
