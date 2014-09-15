@@ -3,6 +3,5 @@
 !.gitignore
 !.vimrc
 !.vim/*
-!.bashrc
 !.bash_aliases
 !.config/terminator
