@@ -1,0 +1,43 @@
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Space Concordia - Joseph 2014
+# 
+# PURPOSE : Define some usefull aliases
+#  
+#  - Add this script in your home directory ~/.CS1_aliases
+#  - and the following 3 lines in your ~/.bashrc 
+#       if [ -f ~/.CS1_aliases ]; then
+#           . ~/.CS1_aliases
+#       fi
+#  - Modify $GIT_HOME as needed
+#------------------------------------------------------------------------------
+
+GIT_HOME="~/CONSAT1"          ### the folder that contains all CS1 projects
+
+CS1_APPS="/home/apps"
+CS1_LOGS="/home/logs"
+CS1_PIDS="/home/pids"
+CS1_PIPES="/home/pipes"
+CS1_TGZ="/home/tgz"
+
+alias csl="cd $CS1_LOGS"
+alias csa="cd $CS1_APPS"
+alias cspids="cd $CS1_PIDS"
+alias cspipes="cd $CS1_PIPES"
+alias cst="cd $CS1_TGZ"
+
+# repo
+alias cs1="cd $GIT_HOME"
+alias cscommander="cd $GIT_HOME/space-commander"
+alias cslib="cd $GIT_HOME/space-lib"
+alias csnetman="cd $GIT_HOME/space-netman"
+alias csscript="cd $GIT_HOME/space-script"
+alias cstools="cd $GIT_HOME/space-tools"
+alias csupdater="cs1 && cd space-updater"
+alias csupdaterapi="cs1 && cd space-updater-api"
+alias cswatchpuppy="cs1 && cd watch-puppy"
+
+# short
+alias css="csscript"
+alias cscom="cscommander"
+alias cstw="css && cd tgz-wizard"
+alias cswp="cswatchpuppy"
