@@ -106,6 +106,8 @@ TEST_F(Shakespeare_Test, DirectoryExists)
 TEST_F(Shakespeare_Test, LogShorthand) {
     Shakespeare::Priority test_priority = Shakespeare::NOTICE;
     int log_result = Shakespeare::log_shorthand(TEST_LOG_PATH, test_priority, PROCESS, "Test Log Message");
+    string filename = Shakespeare::get_filename(TEST_LOG_PATH,PROCESS,".log");
+    remove (filename.c_str());
     ASSERT_EQ(0,log_result);
 }
 
@@ -114,6 +116,8 @@ TEST_F(Shakespeare_Test, Binary)
 {
     // make a binary log entry
     FILE *test_log;
+    // fetch log entries
+    string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
     test_log = Shakespeare::open_log("/tmp/",PROCESS);
     if (test_log != NULL) 
     {
@@ -128,8 +132,6 @@ TEST_F(Shakespeare_Test, Binary)
             result = Shakespeare::log_bin(test_log, logPriority, test_subsystem, bin_val);    
             ASSERT_EQ(0,result);
 
-            // fetch log entries
-            string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
             Shakespeare::BinaryLogEntry logEntry;
             logEntry = Shakespeare::read_bin_entry(filename,i);
            
@@ -139,7 +141,7 @@ TEST_F(Shakespeare_Test, Binary)
                 BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
             );
             #endif
-            
+
             print_binary_entry(stdout, logEntry);
             //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
             ASSERT_EQ(test_subsystem,logEntry.subsystem); 
@@ -149,6 +151,7 @@ TEST_F(Shakespeare_Test, Binary)
             test_subsystem++;
         }        
         fclose(test_log);
+        remove(filename.c_str());
     } else FAIL();
 }
 

@@ -22,10 +22,10 @@ namespace Shakespeare
     };
     // struct to hold the parsed values of a binary log entry
     typedef struct  {
-        time_t 	date_time;
-        uint8_t subsystem;
-        uint8_t	priority;
-        uint8_t	data;
+        time_t 	    date_time;
+        uint8_t     subsystem;
+        uint8_t	    priority;
+        uint16_t	data;
     } BinaryLogEntry;
 
     /**

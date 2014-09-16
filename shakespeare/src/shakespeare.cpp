@@ -200,13 +200,11 @@ namespace Shakespeare
         time_t itime;
         time(&itime);
         size_t elements_written = 0;
-        // TODO add deliminator for future validation
         elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
         elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
         elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
         elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
         fflush(lf);
-        //elements_written = elements_written + fwrite("\0", sizeof(char), 1,lf); // we know the length of a log entry
         return (elements_written == 4) ? 0 : 1;
     }
 
@@ -231,13 +229,13 @@ namespace Shakespeare
         Shakespeare::BinaryLogEntry log_entry;
         static ifstream inputBinary;
         inputBinary.open(filename.c_str(),ios_base::binary);
-        streampos abs_position = entry_position*BINARY_LOG_ENTRY_SIZE;
+        streampos abs_position = entry_position*sizeof(log_entry);
         
         // store EOF conditions
         inputBinary.seekg(0,ios::end);
         int file_size;
         file_size = inputBinary.tellg();
-        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/BINARY_LOG_ENTRY_SIZE);
+        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/sizeof(log_entry));
 
         // seek back to beginning of file
         inputBinary.seekg(0,ios::beg);
@@ -247,7 +245,7 @@ namespace Shakespeare
 
         // take a reading if boundary conditions are met
         int cur_pos = inputBinary.tellg();
-        if ( file_size-cur_pos >= BINARY_LOG_ENTRY_SIZE) {
+        if ( (unsigned)(file_size - cur_pos) >= sizeof(log_entry) ) {
             if (inputBinary) { // read and return log entry
                 inputBinary.read( (char*)&log_entry, sizeof(log_entry) );
             }
