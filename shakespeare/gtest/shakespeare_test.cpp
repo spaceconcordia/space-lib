@@ -7,7 +7,7 @@
 #define READINGSIZE     4 // bytes
 #define PRIORITYSIZE    1 // byte
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
-#define BINARY_LOG_ENTRY_SIZE 11
+#define BINARY_LOG_ENTRY_SIZE 12
 #define TEST_LOG_PATH "/tmp/shakespeare_testing"
 
 class Shakespeare_Test : public ::testing::Test
@@ -31,45 +31,39 @@ TEST_F(Shakespeare_Test, LittleEndian)
   ASSERT_EQ(LE,endian());
 }
 
-TEST_F(Shakespeare_Test, TypeTest)
-{
-  ASSERT_EQ(SIZEOF_TIMET,sizeof(time_t));
-  ASSERT_EQ(SIZEOF_UINT8T,sizeof(uint8_t));
-  ASSERT_EQ(SIZEOF_INT,sizeof(int));
-  ASSERT_EQ(BINARY_LOG_ENTRY_SIZE,COMPILER_CALCULATED_LOG_ENTRY_SIZE);
-}
-
-// EnsureFilePath 
 // Make sure space is replaced with underscore, and slash is added
-TEST_F(Shakespeare_Test, EnsureFilepath)
+TEST_F(Shakespeare_Test, CharacterReplacement)
 {    
-    string actual_filepath = Shakespeare::ensure_filepath("/media/Data/Development/CONSAT1/space-lib/shakespeare/test folder");
-    string expected_filepath = "/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder/";
+    string actual_filepath = Shakespeare::ensure_filepath("/tmp/test folder");
+    string expected_filepath = "/tmp/test_folder/";
     ASSERT_STREQ( 
         expected_filepath.c_str(), // expected
         actual_filepath.c_str()  // actual
     ); 
 }
 
-// GetFilename
 // Test filename and path construction
-// TODO WHAT ELSE?
 TEST_F(Shakespeare_Test, GetFilename)
 {
     string process = "TestProc";
     string extension = ".log";
     stringstream ss; 
-    string folder = "/media/Data/Development/CONSAT1/space-lib/shakespeare/test_folder/";
+    string folder = "/tmp/test_folder/";
     char *buffer = Shakespeare::get_custom_time("%Y%m%d"); 
     ss << buffer;
     string expected_file = folder + process + ss.str() + extension;
 
-    string actual_file = Shakespeare::get_filename("/media/Data/Development/CONSAT1/space-lib/shakespeare/test folder", process, extension);
+    string actual_file = Shakespeare::get_filename("/tmp/test folder", process, extension);
 
     ASSERT_STREQ(
         expected_file.c_str(), // expected
         actual_file.c_str()  // actual
     ); 
+
+    ASSERT_EQ(
+        true,
+        Shakespeare::directory_exists(folder.c_str())
+    );
 }
 
 /*
@@ -84,7 +78,6 @@ TEST_F(Shakespeare_Test, GetCustomDate)
 }
 */
 
-// Directory exists
 // Make sure there are no false positives or false negative
 // TODO test a REALLY long filepath
 TEST_F(Shakespeare_Test, DirectoryExists)
@@ -113,6 +106,8 @@ TEST_F(Shakespeare_Test, DirectoryExists)
 TEST_F(Shakespeare_Test, LogShorthand) {
     Shakespeare::Priority test_priority = Shakespeare::NOTICE;
     int log_result = Shakespeare::log_shorthand(TEST_LOG_PATH, test_priority, PROCESS, "Test Log Message");
+    string filename = Shakespeare::get_filename(TEST_LOG_PATH,PROCESS,".log");
+    remove (filename.c_str());
     ASSERT_EQ(0,log_result);
 }
 
@@ -121,6 +116,8 @@ TEST_F(Shakespeare_Test, Binary)
 {
     // make a binary log entry
     FILE *test_log;
+    // fetch log entries
+    string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
     test_log = Shakespeare::open_log("/tmp/",PROCESS);
     if (test_log != NULL) 
     {
@@ -135,8 +132,6 @@ TEST_F(Shakespeare_Test, Binary)
             result = Shakespeare::log_bin(test_log, logPriority, test_subsystem, bin_val);    
             ASSERT_EQ(0,result);
 
-            // fetch log entries
-            string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
             Shakespeare::BinaryLogEntry logEntry;
             logEntry = Shakespeare::read_bin_entry(filename,i);
            
@@ -146,7 +141,7 @@ TEST_F(Shakespeare_Test, Binary)
                 BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
             );
             #endif
-            
+
             print_binary_entry(stdout, logEntry);
             //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
             ASSERT_EQ(test_subsystem,logEntry.subsystem); 
@@ -156,6 +151,7 @@ TEST_F(Shakespeare_Test, Binary)
             test_subsystem++;
         }        
         fclose(test_log);
+        remove(filename.c_str());
     } else FAIL();
 }
 

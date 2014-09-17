@@ -19,16 +19,13 @@
 #include <sys/time.h>
 
 #define TIMEBUFFERSIZE  80
-#define READINGSIZE     4 // bytes
+#define READINGSIZE     sizeof(uint16_t) // bytes
 #define PRIORITYSIZE    1 // byte
-#define SIZEOF_TIMET    8
-#define SIZEOF_UINT8T   1
-#define SIZEOF_INT      4
-#define BINARY_LOG_ENTRY_SIZE (SIZEOF_TIMET+SIZEOF_UINT8T+SIZEOF_UINT8T+SIZEOF_UINT8T) // timestamp, subsystem_id, priority_id, reading
-#define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
+//#define BINARY_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint16_t)) // timestamp, subsystem_id, priority_id, reading
+#define BINARY_LOG_ENTRY_SIZE 12 // timestamp, subsystem_id, priority_id, reading, 4 extra bytes in case of 8-byte time_t
 
 #define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
-#define LOG_FILE_EXTENSION   ".log"
+#define LOG_FILE_EXTENSION ".log"
 #define LOG_ENTRY_DATE_POSITION 0
 #define LOG_ENTRY_SUBSYSTEM_POSITION sizeof(time_t)
 #define LOG_ENTRY_PRIORITY_POSITION (LOG_ENTRY_SUBSYSTEM_POSITION+sizeof(int))
@@ -60,7 +57,6 @@ namespace Shakespeare
         return buffer;
     }
 
-    // check if a given file is at its size limit
     // TODO deprecated since tgzWizard 
     int file_size_limit_reached(char *filepath) {
         struct stat st;
@@ -83,43 +79,42 @@ namespace Shakespeare
         return false;
     }
 
-    // if filepath has spaces they must be escaped!
-    // function to validate filepath and create directory structure if missing
     string ensure_filepath(string folder) 
     {
-        //check if filepath exists, else create it
-        if ( !directory_exists(folder.c_str()) ) {
+        // check for trailing slash
+        if ( folder[folder.length()-1] != '/')
+        {
+            folder += '/';
+        }
+
+        size_t i;
+        string temp_folder; // in case we need to add backslash
+
+        // check for spaces in the given filepath, replace with underscore
+        for (i=0;i<(folder.length()-1);i++)
+        {
+            if ( isspace(folder[i]) )
+            {
+               folder[i] = '_'; // for now, replace with underscore
+            }
+        }
+
+        if ( !directory_exists(folder.c_str()) ) 
+        {
            printf ("%s Directory does not exist! Attempting to create it... %s:%d \r\n", 
                     folder.c_str(), __FILE__,__LINE__);  
           
            int mkdir_result = mkdir(folder.c_str(),S_IRWXU);
 
            if ( !directory_exists(folder.c_str()) || (mkdir_result != 0) ) {
-                   printf ("Failed creating path: %s! %s:%d",folder.c_str(), __FILE__,__LINE__);
+                   printf ("Failed creating path: %s %s:%d\n",folder.c_str(), __FILE__,__LINE__);
            }
         }
 
-        // check for spaces and slashes
-        if ( folder[folder.length()-1] != '/')
-        {
-            folder += '/';
-        }
-        size_t i;
-        string temp_folder; // in case we need to add backslash
-        // check for spaces in the given filepath, replace with underscore
-        for (i=0;i<(folder.length()-1);i++)
-        {
-            if ( isspace(folder[i]) )
-            {
-               folder[i] = '_'; // for now, replace with underscore. bad user.
-            }
-        }
         return folder;
     }
 
-
-    // TODO document
-    string get_filename(string folder, string prefix, string suffix) 
+    string get_filename(string folder, string stem, string suffix) 
     {
         folder = ensure_filepath(folder);
 
@@ -141,7 +136,7 @@ namespace Shakespeare
         }
         
         int number = 0;
-        char *buffer = Shakespeare::get_custom_time("%Y%m%d"); // new file every day
+        char *iso_date = Shakespeare::get_custom_time("%Y%m%d"); // new file every day
 
         if (directoryListing.size() > 0)
         {
@@ -165,17 +160,10 @@ namespace Shakespeare
             number = atoi(result.c_str());
             number += 1; 
         }
-        stringstream ss;//create a stringstream
-        ss << buffer;//add stime to the stream
-
-        return folder + prefix + ss.str() + suffix;
+        return folder + stem + iso_date + suffix;
     }
 
-    /*
-     * Function to provide shorthand to returning file pointer for
-     * Shakespeare Log (SL) file
-     * TODO enforce NULL input pointer 
-     */
+    // TODO enforce NULL input pointer 
     FILE * open_log(string folder,string process) {
         FILE *LogFile = fopen(get_filename(folder, process, LOG_FILE_EXTENSION).c_str(),"a");
         return LogFile;
@@ -212,13 +200,11 @@ namespace Shakespeare
         time_t itime;
         time(&itime);
         size_t elements_written = 0;
-        // TODO add deliminator for future validation
-        elements_written = elements_written + fwrite(&itime,        SIZEOF_TIMET, 1,lf);
-        elements_written = elements_written + fwrite(&process_id,   SIZEOF_UINT8T,1,lf); 
-        elements_written = elements_written + fwrite(&ePriority,    SIZEOF_UINT8T,1,lf);
-        elements_written = elements_written + fwrite(&data,         SIZEOF_UINT8T,1,lf);
+        elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
+        elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
+        elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
+        elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
         fflush(lf);
-        //elements_written = elements_written + fwrite("\0", sizeof(char), 1,lf); // we know the length of a log entry
         return (elements_written == 4) ? 0 : 1;
     }
 
@@ -227,7 +213,7 @@ namespace Shakespeare
         time_t 	date_time;
         uint8_t subsystem;
         uint8_t	priority;
-        uint8_t	data;
+        uint16_t	data;
     } BinaryLogEntry;
 
     // Method to read an entry from a binary file
@@ -243,13 +229,13 @@ namespace Shakespeare
         Shakespeare::BinaryLogEntry log_entry;
         static ifstream inputBinary;
         inputBinary.open(filename.c_str(),ios_base::binary);
-        streampos abs_position = entry_position*BINARY_LOG_ENTRY_SIZE;
+        streampos abs_position = entry_position*sizeof(log_entry);
         
         // store EOF conditions
         inputBinary.seekg(0,ios::end);
         int file_size;
         file_size = inputBinary.tellg();
-        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/BINARY_LOG_ENTRY_SIZE);
+        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/sizeof(log_entry));
 
         // seek back to beginning of file
         inputBinary.seekg(0,ios::beg);
@@ -259,7 +245,7 @@ namespace Shakespeare
 
         // take a reading if boundary conditions are met
         int cur_pos = inputBinary.tellg();
-        if ( file_size-cur_pos >= BINARY_LOG_ENTRY_SIZE) {
+        if ( (unsigned)(file_size - cur_pos) >= sizeof(log_entry) ) {
             if (inputBinary) { // read and return log entry
                 inputBinary.read( (char*)&log_entry, sizeof(log_entry) );
             }
