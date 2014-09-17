@@ -19,17 +19,17 @@ class SpaceString
             unsigned int uint;
             char cstr[4];
         };
-        union Converter_timet_8char
+        union Converter_timet_timetbytesizechar
         {
             time_t time;
-            char cstr[8];
+            char cstr[sizeof(time_t)];
          };
     public:
         static char* get4Char(char char_buf[4], unsigned int uint);
         static size_t getUInt(const char cstr[4]);
         static char* BuildPath(char *path_buf, const char *dir, const char *file);
-        static char* get8Char(char char_buf[8], time_t time);
-        static time_t getTimet(const char cstr[8]);
+        static char* getTimetInChar(char char_buf[sizeof(time_t)], time_t time);
+        static time_t getTimet(const char cstr[sizeof(time_t)]);
 
 };
 #endif

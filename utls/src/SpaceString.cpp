@@ -63,11 +63,12 @@ char* SpaceString::get4Char(char char_buf[4], unsigned int uint)
  * PURPOSE : Converts an 8 byte char sequence to time_t
  *
  *-----------------------------------------------------------------------------*/
-time_t SpaceString::getTimet(const char cstr[8])
+time_t SpaceString::getTimet(const char cstr[sizeof(time_t)])
 {
-    Converter_timet_8char converter = {0};
+    Converter_timet_timetbytesizechar converter = {0};
+
     if (cstr){
-        memcpy(converter.cstr,cstr,8);
+        memcpy(converter.cstr,cstr,sizeof(time_t));
     }
 
     return converter.time;
@@ -80,15 +81,15 @@ time_t SpaceString::getTimet(const char cstr[8])
  * PURPOSE : Converts time_t to an 8 byte char sequence 
  *
  *-----------------------------------------------------------------------------*/
-char* SpaceString::get8Char(char char_buf[8], time_t time)
+char* SpaceString::getTimetInChar(char char_buf[sizeof(time_t)], time_t time)
 {
-    Converter_timet_8char converter = {0};
-
+    Converter_timet_timetbytesizechar converter = {0};
+ 
     if (char_buf){
         converter.time = time;
     }
 
-    memcpy(char_buf, converter.cstr, 8);
+    memcpy(char_buf, converter.cstr, sizeof(time_t));
 
     return char_buf;
 }
