@@ -4,10 +4,7 @@
 #include <stdint.h>
 #define PROCESS "GTEST"
 #define TIMEBUFFERSIZE  80
-#define READINGSIZE     4 // bytes
-#define PRIORITYSIZE    1 // byte
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
-#define BINARY_LOG_ENTRY_SIZE 12
 #define TEST_LOG_PATH "/tmp/shakespeare_testing"
 
 class Shakespeare_Test : public ::testing::Test
@@ -135,14 +132,12 @@ TEST_F(Shakespeare_Test, Binary)
             Shakespeare::BinaryLogEntry logEntry;
             logEntry = Shakespeare::read_bin_entry(filename,i);
            
-            #ifdef CS1_DEBUG
             printf (
                 "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
-                BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
+                sizeof(logEntry),logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
             );
-            #endif
-
             print_binary_entry(stdout, logEntry);
+
             //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
             ASSERT_EQ(test_subsystem,logEntry.subsystem); 
             ASSERT_EQ(logPriority,logEntry.priority); 

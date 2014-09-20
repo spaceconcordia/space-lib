@@ -19,23 +19,22 @@
 #include <sys/time.h>
 
 #define TIMEBUFFERSIZE  80
-#define READINGSIZE     sizeof(uint16_t) // bytes
-#define PRIORITYSIZE    1 // byte
-//#define BINARY_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint16_t)) // timestamp, subsystem_id, priority_id, reading
-#define BINARY_LOG_ENTRY_SIZE 12 // timestamp, subsystem_id, priority_id, reading, 4 extra bytes in case of 8-byte time_t
-
+#define DEFAULT_LOG_FOLDER "/home/logs"
 #define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
 #define LOG_FILE_EXTENSION ".log"
 #define LOG_ENTRY_DATE_POSITION 0
 #define LOG_ENTRY_SUBSYSTEM_POSITION sizeof(time_t)
 #define LOG_ENTRY_PRIORITY_POSITION (LOG_ENTRY_SUBSYSTEM_POSITION+sizeof(int))
 #define LOG_ENTRY_READING_POSITION (LOG_ENTRY_PRIORITY_POSITION+sizeof(int))
+#define SIZEOF_BIN_LOG_ENTRY sizeof BinaryLogEntry
         
 #define NULL_CHAR_POINTER 8
+
 
 using namespace std;
 namespace Shakespeare
 {
+    extern const char* cs1_systems[];
     enum Priority {
         NOTICE,
         WARNING,
@@ -190,22 +189,8 @@ namespace Shakespeare
         return log_result; 
     }
 
-    /** Method to log a single integer to file as binary, which will 
-     *  support most logging needs
-     *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
-    */
-    int log_bin(FILE* lf, Priority ePriority, int process_id, int data) {
-        if (lf==NULL) return CS1_NULL_FILE_POINTER;
-        fflush(lf);
-        time_t itime;
-        time(&itime);
-        size_t elements_written = 0;
-        elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
-        elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
-        elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
-        elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
-        fflush(lf);
-        return (elements_written == 4) ? 0 : 1;
+    int log(Priority logPriority, string process, string msg) {
+        return log_shorthand (DEFAULT_LOG_FOLDER, logPriority, process, msg);
     }
 
     // struct to hold the parsed values of a binary log entry
@@ -215,6 +200,48 @@ namespace Shakespeare
         uint8_t	priority;
         uint16_t	data;
     } BinaryLogEntry;
+
+    /** Method to log a single integer to file as binary, which will 
+     *  support most logging needs
+     *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
+    */
+    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) {
+        if (lf==NULL) return CS1_NULL_FILE_POINTER;
+        fflush(lf);
+        time_t itime;
+        time(&itime);
+        size_t elements_written = 0;
+
+        size_t log_entry_padding = sizeof(BinaryLogEntry) - ( sizeof(time_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) );
+
+        elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
+        elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
+        elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
+        elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
+        if (log_entry_padding > 0) {
+            elements_written = elements_written + fwrite("\0",      log_entry_padding,1,lf);
+        }
+
+        fflush(lf);
+        return (elements_written == 4) ? 0 : 1;
+    }
+
+    // faster method to make log entries
+    int log_bin_shorthand(string log_folder, Priority logPriority, uint8_t process_id, short int data) {
+        FILE *test_log;
+        char * process = const_cast<char*>(cs1_systems[process_id]);
+        test_log = open_log(log_folder,process); 
+        int log_result=-1;
+        if(test_log!=NULL) {
+            log_result = Shakespeare::log_bin(test_log, logPriority, process_id, data);
+        }
+        fclose(test_log);
+        return log_result; 
+    }
+
+    int log_bin(string log_folder, Priority logPriority, uint8_t process_id, short int data) {
+       return Shakespeare::log_bin_shorthand(log_folder, logPriority, process_id, data); 
+    }
 
     // Method to read an entry from a binary file
     // @param string filename - the name of the file which stores binary log entries
@@ -235,7 +262,10 @@ namespace Shakespeare
         inputBinary.seekg(0,ios::end);
         int file_size;
         file_size = inputBinary.tellg();
-        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/sizeof(log_entry));
+
+        #ifdef CS1_DEBUG
+            printf ("End: filesize:%d,entries:%ld\n", file_size, file_size / sizeof(log_entry) );
+        #endif
 
         // seek back to beginning of file
         inputBinary.seekg(0,ios::beg);

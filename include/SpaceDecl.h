@@ -81,21 +81,20 @@
 #define CS1_AT_RUNNER    0x01
 #define CS1_BABY_CRON    0x02
 #define CS1_COMMANDER    0x03
-#define CS1_COMMS        0x05
-#define CS1_CHECKSUM     0x06
-#define CS1_HARDWARE     0x07
-#define CS1_HELIUM       0x08
-#define CS1_MECH         0x09
-#define CS1_NETMAN       0x0a
-#define CS1_PAYLOAD      0x0b
-#define CS1_POWER        0x0c
-#define CS1_SOFTWARE     0x0d
-#define CS1_SHAKESPEARE  0x0e
+#define CS1_CHECKSUM     0x04
+#define CS1_HARDWARE     0x05
+#define CS1_HELIUM       0x06
+#define CS1_MECH         0x07
+#define CS1_NETMAN       0x08
+#define CS1_PAYLOAD      0x09
+#define CS1_POWER        0x0a
+#define CS1_SOFTWARE     0x0b
+#define CS1_SHAKESPEARE  0x0c
 #define CS1_PROCESS_MON  0x0d
-#define CS1_TGZ_WIZARD   0x10 
-#define CS1_TIMER        0x11 
-#define CS1_UPDATER      0x12
-#define CS1_UPDATER_API  0x13
+#define CS1_TGZ_WIZARD   0x0e 
+#define CS1_TIMER        0x0f 
+#define CS1_UPDATER      0x10
+#define CS1_UPDATER_API  0x11
 #define CS1_UNDEF_SUB    0xFF
 
 // Software Subsystem IDs for logging purposes

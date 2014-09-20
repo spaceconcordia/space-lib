@@ -40,8 +40,8 @@ CPPUTEST_LIBS=-lCppUTest -lCppUTestExt
 # All Object files, do not use wildcard, add the ones you need explicitly!
 #
 Q6_TAG=Q6
-OBJECTS = bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o
-OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o 
+OBJECTS = bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o bin/cs1_systems.o
+OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o bin/cs1_systems$(Q6_TAG).o
 
 #
 # CppUTest files, no wildcard, add files explicitly!
@@ -64,7 +64,7 @@ lib/libcs1_utls.a: $(OBJECTS)
 	ar rcs $@ $^
 
 bin/%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO)  $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
+	$(CC) $(CFLAGS) $(MEM_LEAK_MACRO) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV) 
 
 bin/fileIO.o: $(SPACE_UPTDATER)/src/fileIO.cpp $(SPACE_UPTDATER)/include/fileIO.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(DEBUGFLAGS) $(INCLUDES) -c $< -o $@ $(ENV)
