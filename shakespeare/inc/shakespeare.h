@@ -12,7 +12,6 @@
 using namespace std;
 namespace Shakespeare
 {
-    extern const char* cs1_systems[];
     enum Priority {
         NOTICE,
         WARNING,
