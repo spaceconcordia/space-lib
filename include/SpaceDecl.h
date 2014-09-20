@@ -119,5 +119,6 @@
 #define CS1_NULL_POINTER                77
 #define CS1_DIRECTORY_DOES_NOT_EXIST    78
 #define CS1_FILE_DOES_NOT_EXIST         79
+extern const char * cs1_systems[];
 
 #endif
