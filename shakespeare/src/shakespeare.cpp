@@ -233,9 +233,8 @@ namespace Shakespeare
         
         // store EOF conditions
         inputBinary.seekg(0,ios::end);
-        int file_size;
+        size_t file_size;
         file_size = inputBinary.tellg();
-        printf ("End: filesize:%d,entries:%d\n",file_size,file_size/sizeof(log_entry));
 
         // seek back to beginning of file
         inputBinary.seekg(0,ios::beg);
