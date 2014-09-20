@@ -26,10 +26,7 @@
 #define LOG_ENTRY_SUBSYSTEM_POSITION sizeof(time_t)
 #define LOG_ENTRY_PRIORITY_POSITION (LOG_ENTRY_SUBSYSTEM_POSITION+sizeof(int))
 #define LOG_ENTRY_READING_POSITION (LOG_ENTRY_PRIORITY_POSITION+sizeof(int))
-#define SIZEOF_BIN_LOG_ENTRY sizeof BinaryLogEntry
-        
-#define NULL_CHAR_POINTER 8
-
+#define SIZEOF_BIN_LOG_ENTRY sizeof(BinaryLogEntry)
 
 using namespace std;
 namespace Shakespeare
@@ -44,7 +41,6 @@ namespace Shakespeare
     };
     string priorities[6] = {"NOTICE","WARNING","DEBUG","ERROR","URGENT","CRITICAL"};
 
-    // TODO document
     char *get_custom_time(string format) {
         char *buffer = (char *) malloc(TIMEBUFFERSIZE);
         time_t rawtime;
@@ -167,7 +163,6 @@ namespace Shakespeare
         return LogFile;
     }
 
-    // TODO document
     // TODO open and close file, requires passing log file path
     int log(FILE* lf, Priority ePriority, string process, string msg) {
         if ( lf == NULL ) return CS1_NULL_FILE_POINTER;
@@ -228,7 +223,7 @@ namespace Shakespeare
     // faster method to make log entries
     int log_bin_shorthand(string log_folder, Priority logPriority, uint8_t process_id, short int data) {
         FILE *test_log;
-        char * process = const_cast<char*>(cs1_systems[process_id]);
+        const char * process = cs1_systems[process_id];
         test_log = open_log(log_folder,process); 
         int log_result=-1;
         if(test_log!=NULL) {
@@ -238,8 +233,8 @@ namespace Shakespeare
         return log_result; 
     }
 
-    int log_bin(string log_folder, Priority logPriority, uint8_t process_id, short int data) {
-       return Shakespeare::log_bin_shorthand(log_folder, logPriority, process_id, data); 
+    int log_bin(Priority logPriority, uint8_t process_id, short int data) {
+       return Shakespeare::log_bin_shorthand(DEFAULT_LOG_FOLDER, logPriority, process_id, data); 
     }
 
     // Method to read an entry from a binary file
