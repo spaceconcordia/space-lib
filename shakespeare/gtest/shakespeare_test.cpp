@@ -108,13 +108,20 @@ TEST_F(Shakespeare_Test, LogShorthand) {
     ASSERT_EQ(0,log_result);
 }
 
-/* This test does not make sense at all yet */
+/**
+ * In this test, we use the overloaded log_bin function to log
+ * to 3 different subsystem logs in binary, incrementing by the 
+ * binary value recorded
+ * We then read these log files, parse the log entries into the 
+ * binary log structure, and make sure the entries are consistent
+ * with our input data.
+ */
 TEST_F(Shakespeare_Test, Binary)
 {
     Shakespeare::Priority logPriority = Shakespeare::DEBUG;
     short int bin_val = 5; // hardcoded value mocking as a sensor reading
     uint8_t test_subsystem_id=0; 
-    string test_subsystem = cs1_systems[test_subsystem_id];
+    string test_subsystem; 
     int result,i; 
     int iterations=3;
 
@@ -122,6 +129,7 @@ TEST_F(Shakespeare_Test, Binary)
     
     for (i=0;i<iterations;i++) 
     {
+        test_subsystem = cs1_systems[test_subsystem_id];
         filename = Shakespeare::get_filename("/home/logs/",test_subsystem,".log");
 
         // write log entry
@@ -131,21 +139,22 @@ TEST_F(Shakespeare_Test, Binary)
         // read log entry
         Shakespeare::BinaryLogEntry logEntry;
         logEntry = Shakespeare::read_bin_entry(filename,i);
-       
-        printf (
-            "MAX_LOG_ENTRY_SIZE:%d\nfilename:%s\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
-            sizeof(logEntry),filename.c_str(),logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
-        );
-        print_binary_entry(stdout, logEntry);
+      
+        #ifdef DDEBUG 
+            printf (
+                "MAX_LOG_ENTRY_SIZE:%d\nfilename:%s\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
+                sizeof(logEntry),filename.c_str(),logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
+            );
+            print_binary_entry(stdout, logEntry);
+        #endif
 
         //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
         ASSERT_EQ(test_subsystem_id,logEntry.subsystem); 
         ASSERT_EQ(logPriority,logEntry.priority); 
         ASSERT_EQ(bin_val,logEntry.data);
         bin_val++;
-        test_subsystem_id++;
-        remove(filename.c_str());
     }        
+    remove(filename.c_str());
 } 
 
 

@@ -158,28 +158,36 @@ namespace Shakespeare
     }
 
     // TODO enforce NULL input pointer 
-    FILE * open_log(string folder,string process) {
+    FILE * open_log(string folder,string process) 
+    {
         FILE *LogFile = fopen(get_filename(folder, process, LOG_FILE_EXTENSION).c_str(),"a");
         return LogFile;
     }
 
     // TODO open and close file, requires passing log file path
-    int log(FILE* lf, Priority ePriority, string process, string msg) {
-        if ( lf == NULL ) return CS1_NULL_FILE_POINTER;
+    int log(FILE* lf, Priority ePriority, string process, string msg) 
+    {
+        if ( lf == NULL ) 
+        {
+           return CS1_NULL_FILE_POINTER;
+        }
         fflush(lf);
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
 
     // faster method to make log entries
-    int log_shorthand(string log_folder, Priority logPriority, string process, string msg) {
+    int log_shorthand(string log_folder, Priority logPriority, string process, string msg) 
+    {
         FILE *test_log;
         test_log = open_log(log_folder,process); 
         int log_result=-1;
-        if(test_log!=NULL) {
+    
+        if(test_log!=NULL) 
+        {
             log_result = Shakespeare::log(test_log, logPriority, process, msg);
+            fclose(test_log);
         }
-        fclose(test_log);
         return log_result; 
     }
 
@@ -199,8 +207,13 @@ namespace Shakespeare
      *  support most logging needs
      *  @param process_id - the id of the process, which will be referenced in SpaceDecl.h
     */
-    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) {
-        if (lf==NULL) return CS1_NULL_FILE_POINTER;
+    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) 
+    {
+        if (lf==NULL) 
+        {
+            return CS1_NULL_FILE_POINTER;
+        }
+
         fflush(lf);
         time_t itime;
         time(&itime);
@@ -212,8 +225,10 @@ namespace Shakespeare
         elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
         elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
         elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
-        if (log_entry_padding > 0) {
-            elements_written = elements_written + fwrite("\0",      log_entry_padding,1,lf);
+
+        if (log_entry_padding > 0) 
+        {
+            elements_written = elements_written + fwrite("\0", log_entry_padding, 1, lf);
         }
 
         fflush(lf);
