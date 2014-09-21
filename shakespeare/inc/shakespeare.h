@@ -60,9 +60,15 @@ namespace Shakespeare
     char *get_custom_time(string format);
 
     FILE * open_log(string folder, string process);
+
     int log(FILE* lf, Priority ePriority, string process, string msg);
     int log_shorthand(string log_folder, Priority logPriority, string process, string msg);
-    int log_bin(FILE* lf, Priority ePriority, int process_id, int data); 
+    int log(Priority logPriority, string process, string msg);
+
+    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data);    
+    int log_bin_shorthand(string log_folder, Priority logPriority, string process, string msg);
+    int log_bin(Priority logPriority, uint8_t process_id, short int data);
+
     int binary_file_size(ifstream bf);
     BinaryLogEntry read_bin_entry(string filename, streampos entryPosition);
     int print_binary_entry(FILE * output_file, BinaryLogEntry entry);

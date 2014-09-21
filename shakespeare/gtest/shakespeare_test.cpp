@@ -4,10 +4,7 @@
 #include <stdint.h>
 #define PROCESS "GTEST"
 #define TIMEBUFFERSIZE  80
-#define READINGSIZE     4 // bytes
-#define PRIORITYSIZE    1 // byte
 #define COMPILER_CALCULATED_LOG_ENTRY_SIZE (sizeof(time_t)+sizeof(uint8_t)+sizeof(uint8_t)+sizeof(uint8_t)) // timestamp, subsystem_id, priority_id, reading
-#define BINARY_LOG_ENTRY_SIZE 12
 #define TEST_LOG_PATH "/tmp/shakespeare_testing"
 
 class Shakespeare_Test : public ::testing::Test
@@ -111,49 +108,55 @@ TEST_F(Shakespeare_Test, LogShorthand) {
     ASSERT_EQ(0,log_result);
 }
 
-/* This test does not make sense at all yet */
+/**
+ * In this test, we use the overloaded log_bin function to log
+ * to 3 different subsystem logs in binary, incrementing by the 
+ * binary value recorded
+ * We then read these log files, parse the log entries into the 
+ * binary log structure, and make sure the entries are consistent
+ * with our input data.
+ */
 TEST_F(Shakespeare_Test, Binary)
 {
-    // make a binary log entry
-    FILE *test_log;
-    // fetch log entries
-    string filename = Shakespeare::get_filename("/tmp/",PROCESS,".log"); // fetch filename to pass for fstream
-    test_log = Shakespeare::open_log("/tmp/",PROCESS);
-    if (test_log != NULL) 
+    Shakespeare::Priority logPriority = Shakespeare::DEBUG;
+    short int bin_val = 5; // hardcoded value mocking as a sensor reading
+    uint8_t test_subsystem_id=0; 
+    string test_subsystem; 
+    int result,i; 
+    int iterations=3;
+
+    string filename; // open only to keep track of it and to clean up the files after the test
+    
+    for (i=0;i<iterations;i++) 
     {
-        Shakespeare::Priority logPriority = Shakespeare::DEBUG;
-        int bin_val = 5; // hardcoded value mocking as a sensor reading
-        int test_subsystem=3; 
-        int result,i; 
-        int iterations=3;
-        
-        for (i=0;i<iterations;i++) {
-            // write log entries
-            result = Shakespeare::log_bin(test_log, logPriority, test_subsystem, bin_val);    
-            ASSERT_EQ(0,result);
+        test_subsystem = cs1_systems[test_subsystem_id];
+        filename = Shakespeare::get_filename("/home/logs/",test_subsystem,".log");
 
-            Shakespeare::BinaryLogEntry logEntry;
-            logEntry = Shakespeare::read_bin_entry(filename,i);
-           
-            #ifdef CS1_DEBUG
+        // write log entry
+        result = Shakespeare::log_bin(logPriority, test_subsystem_id, bin_val);    
+        ASSERT_EQ(CS1_SUCCESS,result);
+
+        // read log entry
+        Shakespeare::BinaryLogEntry logEntry;
+        logEntry = Shakespeare::read_bin_entry(filename,i);
+      
+        #ifdef DDEBUG 
             printf (
-                "MAX_LOG_ENTRY_SIZE:%d\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
-                BINARY_LOG_ENTRY_SIZE,logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
+                "MAX_LOG_ENTRY_SIZE:%d\nfilename:%s\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
+                sizeof(logEntry),filename.c_str(),logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data
             );
-            #endif
-
             print_binary_entry(stdout, logEntry);
-            //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
-            ASSERT_EQ(test_subsystem,logEntry.subsystem); 
-            ASSERT_EQ(logPriority,logEntry.priority); 
-            ASSERT_EQ(bin_val,logEntry.data);
-            bin_val++;
-            test_subsystem++;
-        }        
-        fclose(test_log);
-        remove(filename.c_str());
-    } else FAIL();
-}
+        #endif
+
+        //ASSERT_EQ(logEntry.date_time,bin_val); // TODO how to freeze time for testing? 
+        ASSERT_EQ(test_subsystem_id,logEntry.subsystem); 
+        ASSERT_EQ(logPriority,logEntry.priority); 
+        ASSERT_EQ(bin_val,logEntry.data);
+        bin_val++;
+    }        
+    remove(filename.c_str());
+} 
+
 
 // try to fetch an entry when not enough bytes are available at the end of the file
 /*  
