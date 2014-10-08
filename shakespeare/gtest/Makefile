@@ -23,6 +23,8 @@ INCPATH=../inc/
 GLOBALINCPATH=../../include
 LIBPATH=-L$(UTLS_DIR)/lib
 
+DEBUG_FLAGS=-D'CS1_DEBUG'
+
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
@@ -78,13 +80,13 @@ INCLUDE_PATHS=-I$(GLOBALINCPATH) -I$(UTLS_DIR)/include -I$(INCPATH)
 HEADERS=$(GLOBALINCPATH)/SpaceDecl.h $(UTLS_DIR)/include/Date.h $(USER_DIR)/inc/shakespeare.h
 
 shakespeare.o : $(USER_DIR)/src/shakespeare.cpp $(HEADERS) $(GTEST_HEADERS)
-	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) -I$(USER_DIR)/inc/ $(CXXFLAGS) -c $(USER_DIR)/src/shakespeare.cpp 
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) -I$(USER_DIR)/inc/ $(CXXFLAGS) -c $(USER_DIR)/src/shakespeare.cpp $(DEBUG_FLAGS)
 
 Date.o : $(UTLS_DIR)/src/Date.cpp $(UTLS_DIR)/include/Date.h $(HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(UTLS_DIR)/src/Date.cpp
 
 shakespeare_test : shakespeare.o shakespeare_test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) $(LIBPATH) -lpthread $^ -o $@ -lrt -lcs1_utls -DCS1_DEBUG
+	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) $(LIBPATH) -lpthread $^ -o $@ -lrt -lcs1_utls $(DEBUG_FLAGS)
 
 shakespeare_test.o : $(USER_DIR)/gtest/shakespeare_test.cpp $(HEADERS) $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(INCLUDE_PATHS) $(CXXFLAGS) -c $(USER_DIR)/gtest/shakespeare_test.cpp

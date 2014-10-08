@@ -140,7 +140,7 @@ TEST_F(Shakespeare_Test, Binary)
         Shakespeare::BinaryLogEntry logEntry;
         logEntry = Shakespeare::read_bin_entry(filename,i);
       
-        #ifdef DDEBUG 
+        #ifdef CS1_DEBUG 
             printf (
                 "MAX_LOG_ENTRY_SIZE:%d\nfilename:%s\ntime_t:%ld\nsubsystem:%d\npriority:%d\ndata:%d\n",
                 sizeof(logEntry),filename.c_str(),logEntry.date_time,logEntry.subsystem,logEntry.priority,logEntry.data

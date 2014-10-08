@@ -209,6 +209,7 @@ namespace Shakespeare
     */
     int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) 
     {
+        size_t expected_num_elements = 4;
         if (lf==NULL) 
         {
             return CS1_NULL_FILE_POINTER;
@@ -228,11 +229,12 @@ namespace Shakespeare
 
         if (log_entry_padding > 0) 
         {
+            expected_num_elements=5;
             elements_written = elements_written + fwrite("\0", log_entry_padding, 1, lf);
         }
 
         fflush(lf);
-        return (elements_written == 4) ? 0 : 1;
+        return (elements_written == expected_num_elements) ? 0 : 1;
     }
 
     // faster method to make log entries
