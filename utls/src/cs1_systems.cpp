@@ -35,5 +35,13 @@ const char *cs1_systems[] {
    "TIMER",
    "UPDATER",
    "UPDATER_API",
+   "DISABLE-AHRM",
+   "ENABLE-AHRM",
+   "READ-ACS-MAG",
+   "READ-PWR-INA219",
+   "READ-TEMP-SPTS",
+   "READ-PWR-AD7998",
+   "READ-TEMP-EBPL",
+   "JOB_RUNNER",
    "CS1_UNDEF_SUB"
 };

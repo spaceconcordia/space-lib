@@ -77,34 +77,34 @@
 #define CS1_PATH_MAX PATH_MAX           /* 4096 chars in a path name including nul */
 
 // Subsystem IDs
-#define CS1_ACS          0x00
-#define CS1_AT_RUNNER    0x01
-#define CS1_BABY_CRON    0x02
-#define CS1_COMMANDER    0x03
-#define CS1_CHECKSUM     0x04
-#define CS1_HARDWARE     0x05
-#define CS1_HELIUM       0x06
-#define CS1_MECH         0x07
-#define CS1_NETMAN       0x08
-#define CS1_PAYLOAD      0x09
-#define CS1_POWER        0x0a
-#define CS1_SOFTWARE     0x0b
-#define CS1_SHAKESPEARE  0x0c
-#define CS1_PROCESS_MON  0x0d
-#define CS1_TGZ_WIZARD   0x0e 
-#define CS1_TIMER        0x0f 
-#define CS1_UPDATER      0x10
-#define CS1_UPDATER_API  0x11
-#define CS1_UNDEF_SUB    0xFF
-
-// Software Subsystem IDs for logging purposes
-#define COMMANDER_LOG_ID 	0x10
-#define BABYCRON_LOG_ID 	0x11
-#define UPDATER_API_ID 		0x12
-#define NETMAN_LOG_ID 		0x13
-#define JOBRUNNER_LOG_ID 	0x14
-#define TIMER_LIB_ID 		0x15
-#define SHAKESPEARE_LIB_ID 	0x16
+#define CS1_ACS             0x00
+#define CS1_AT_RUNNER       0x01
+#define CS1_BABY_CRON       0x02
+#define CS1_COMMANDER       0x03
+#define CS1_CHECKSUM        0x04
+#define CS1_HARDWARE        0x05
+#define CS1_HELIUM          0x06
+#define CS1_MECH            0x07
+#define CS1_NETMAN          0x08
+#define CS1_PAYLOAD         0x09
+#define CS1_POWER           0x0a
+#define CS1_SOFTWARE        0x0b
+#define CS1_SHAKESPEARE     0x0c
+#define CS1_PROCESS_MON     0x0d
+#define CS1_TGZ_WIZARD      0x0e 
+#define CS1_TIMER           0x0f 
+#define CS1_UPDATER         0x10
+#define CS1_UPDATER_API     0x11
+#define CS1_DISABLE_AHRM    0x12
+#define CS1_ENABLE_AHRM     0x13
+#define CS1_ACS_MAG         0x14 
+#define CS1_PWR_INA219      0x15
+#define CS1_TEMP_SPTS       0x16
+#define CS1_PWR_AD7998      0x17
+#define CS1_TEMP_EBPL       0x18
+#define CS1_JOB_RUNNER      0x19
+#define CS1_UNDEF_SUB       0xFF
+extern const char * cs1_systems[];
 
 // Commander Config
 #define COMMANER_SLEEP_TIME 1       // seconds
@@ -119,6 +119,5 @@
 #define CS1_NULL_POINTER                77
 #define CS1_DIRECTORY_DOES_NOT_EXIST    78
 #define CS1_FILE_DOES_NOT_EXIST         79
-extern const char * cs1_systems[];
 
 #endif
