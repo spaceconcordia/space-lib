@@ -97,12 +97,13 @@
 #define CS1_UPDATER_API     0x11
 #define CS1_DISABLE_AHRM    0x12
 #define CS1_ENABLE_AHRM     0x13
-#define CS1_ACS_MAG         0x14 
-#define CS1_PWR_INA219      0x15
-#define CS1_TEMP_SPTS       0x16
-#define CS1_PWR_AD7998      0x17
-#define CS1_TEMP_EBPL       0x18
-#define CS1_JOB_RUNNER      0x19
+#define CS1_MECH_AHRM       0x14
+#define CS1_ACS_MAG         0x15 
+#define CS1_PWR_INA219      0x16
+#define CS1_TEMP_SPTS       0x17
+#define CS1_PWR_AD7998      0x18
+#define CS1_TEMP_EBPL       0x19
+#define CS1_JOB_RUNNER      0x1a
 #define CS1_UNDEF_SUB       0xFF
 extern const char * cs1_systems[];
 
