@@ -37,6 +37,7 @@ const char *cs1_systems[] {
    "UPDATER_API",
    "DISABLE-AHRM",
    "ENABLE-AHRM",
+   "MECH-AHRM",
    "READ-ACS-MAG",
    "READ-PWR-INA219",
    "READ-TEMP-SPTS",
