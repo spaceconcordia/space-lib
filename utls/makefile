@@ -40,7 +40,7 @@ CPPUTEST_LIBS=-lCppUTest -lCppUTestExt
 # All Object files, do not use wildcard, add the ones you need explicitly!
 #
 Q6_TAG=Q6
-OBJECTS = bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o bin/cs1_systems.o
+OBJECTS = bin/i2c-device.o bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o bin/cs1_systems.o
 OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o bin/cs1_systems$(Q6_TAG).o
 
 #
