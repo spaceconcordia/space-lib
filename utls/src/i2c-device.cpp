@@ -9,7 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <linux/i2c-dev.h>
-
+#include <SpaceDecl.h>
 #include "i2c-device.h"
 
 
@@ -24,21 +24,21 @@
 int I2CDevice::I2CRead(char* filename, char* i2c_buffer)
 {
     FILE* file;
-    char error_msg[100];
+    char error_msg[MAX_ERROR_MSG_SIZE];
     if ( (file = fopen(filename,"r")) == NULL )
     {  
-        sprintf(error_msg,"Fopen failed to open I2C device at path %s and returned error message %s \n",filename, strerror(errno));
+        snprintf(error_msg,MAX_ERROR_MSG_SIZE,"Fopen failed to open I2C device at path %s and returned error message %s \n",filename, strerror(errno));
         //Shakespeare::log(Priority::ERROR,s_cs1_subsystems[Hardware],errorMsg);
-        //return CS1_FAILURE;
-        return -1;
+        return CS1_FAILURE;
     }
     if ((fgets(i2c_buffer,I2C_MAX_BUF_SIZE,file))== NULL)
     {
-        sprintf(error_msg,"Fgets failed to read I2C device at path %s and returned error message %s \n",filename, strerror(errno));
+        snprintf(error_msg,MAX_ERROR_MSG_SIZE,"Fgets failed to read I2C device at path %s and returned error message %s \n",filename, strerror(errno));
         //Shakespeare::log(Priority::ERROR,s_cs1_subsystems[Hardware],error_msg);
+        return CS1_FAILURE;
     }
     fclose(file);  
-    return 1;
+    return CS1_SUCCESS;
 }
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
@@ -49,29 +49,29 @@ int I2CDevice::I2CRead(char* filename, char* i2c_buffer)
 *-----------------------------------------------------------------------------*/
 int I2CDevice::I2CWriteToRTC(struct rtc_time rt,int bus_number)
 {   
-    char* file_handler;
+    char file_handler[15];
     sprintf(file_handler,"/dev/rtc%d",bus_number);
     int file = open(file_handler,O_RDWR);
-    char error_msg[100]; 
+    char error_msg[MAX_ERROR_MSG_SIZE]; 
     if (file < 0 )
     {
-        sprintf(error_msg,"Open failed to open RTC at %s and returned errno %s \n", file_handler,strerror(errno));
+        snprintf(error_msg,MAX_ERROR_MSG_SIZE,"Open failed to open RTC at %s and returned errno %s \n", file_handler,strerror(errno));
         //Shakespeare::log(Priority:ERROR,s_cs1_subsystems[Hardware],errorMsg);
-        return -1;
+        return CS1_FAILURE;
     }
     else
     {
         file = ioctl(file,RTC_SET_TIME,&rt);
         if ( file < 0 )
         {
-            sprintf(error_msg,"IOCTL failed to set RTC at %s and returned errno %s \n", file_handler,strerror(errno));
+            snprintf(error_msg,MAX_ERROR_MSG_SIZE,"IOCTL failed to set RTC at %s and returned errno %s \n", file_handler,strerror(errno));
         //Shakespeare::log(Priority:ERROR,s_cs1_subsystems[Hardware],error_msg);
-
+            return CS1_FAILURE;
         }
         
     }
     close(file);
-    return 1;            
+    return CS1_SUCCESS;            
 }
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *

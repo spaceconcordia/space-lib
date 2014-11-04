@@ -1,5 +1,6 @@
 #ifndef I2C_DEVICE_H
 #define I2C_DEVICE_H
+#define MAX_ERROR_MSG_SIZE 100
 
 #include <linux/rtc.h>
 
