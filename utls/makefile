@@ -46,7 +46,7 @@ OBJECTS_Q6 = bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q
 #
 # CppUTest files, no wildcard, add files explicitly!
 #
-UNIT_TEST = tests/utl-test.cpp
+UNIT_TEST = tests/utl-test.cpp tests/i2c-device-test.cpp
 CS1_UTEST_DIR="cs1_utest" # as defined in SpaceDecl.h
 
 #
