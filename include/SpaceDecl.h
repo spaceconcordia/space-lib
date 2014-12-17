@@ -66,6 +66,7 @@
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
 #define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
+#define CS1_MAX_LOG_ENTRY 255
 
 #define BE 1
 #define LE 0
