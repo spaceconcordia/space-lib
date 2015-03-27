@@ -9,9 +9,7 @@ namespace I2CDevice {
     int I2CRead(const char* filename, char* i2c_buffer);
     int I2CWrite();
     int I2CWriteToRTC(struct rtc_time rt,int i2c_bus);
-    int readDevice (char* pPath, const char* deviceName) 
-
     extern char error_msg[MAX_ERROR_MSG_SIZE];
-    extern int error_num;
+    extern int error_num; 
 };
 #endif

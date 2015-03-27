@@ -17,7 +17,7 @@ namespace I2CDevice
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
 * NAME : I2CRead
-*
+* 
 * PURPOSE : Read the i2c-devices register values into a buffer
 *
 *-----------------------------------------------------------------------------*/
@@ -28,7 +28,7 @@ int I2CRead(const char* filename, char* i2c_buffer)
     error_num = 0;
     FILE* file;
     if ( (file = fopen(filename,"r")) == NULL )
-    {
+    {  
         snprintf(error_msg,MAX_ERROR_MSG_SIZE,"Fopen failed to open I2C device at path %s and returned error message %s \n",filename, strerror(errno));
         error_num = errno;
         return CS1_FAILURE;
@@ -39,18 +39,18 @@ int I2CRead(const char* filename, char* i2c_buffer)
         error_num = errno;
         return CS1_FAILURE;
     }
-    fclose(file);
+    fclose(file);  
     return CS1_SUCCESS;
 }
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
 * NAME : I2CWriteToRTC
-*
+* 
 * PURPOSE : Write to the RTC to set the time
 *
 *-----------------------------------------------------------------------------*/
 int I2CWriteToRTC(struct rtc_time rt,int bus_number)
-{
+{   
     error_num = 0;
     char file_handler[15];
     snprintf(file_handler,15,"/dev/rtc%d",bus_number);
@@ -68,15 +68,15 @@ int I2CWriteToRTC(struct rtc_time rt,int bus_number)
             snprintf(error_msg,MAX_ERROR_MSG_SIZE,"IOCTL failed to set RTC at %s and returned errno %s \n", file_handler,strerror(errno));
             return CS1_FAILURE;
         }
-
+        
     }
     close(file);
-    return CS1_SUCCESS;
+    return CS1_SUCCESS;            
 }
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
 * NAME : I2CWrite
-*
+* 
 * PURPOSE : Write to the i2c-device register
 *
 *-----------------------------------------------------------------------------*/
@@ -85,38 +85,7 @@ int I2CWrite()
     return 1;
 
 
-
+    
 
 }
-
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-*
-* NAME : readDevice
-*
-* PURPOSE : Used for reading from devices in various jobs.
-*
-*-----------------------------------------------------------------------------*/
-int readDevice (char* pPath, const char* deviceName) {
-	if(pPath == NULL)
-		return NULL_PATH_ERROR;
-
-	if (deviceName == NULL)
-		return NULL_DEVICENAME_ERROR;
-
-	char result[100];
-	strcpy(result,pPath); // copy string one into the result.
-	strcat(result,deviceName);
-	I2CRead(result,readBuff);
-	short int temp_data = strtol(readBuff,NULL,0);
-	Shakespeare::log_bin(Shakespeare::NOTICE,process_id,temp_data);
-
-	return CS1_SUCCESS;
-}
-
-
-
-
-
-
-
 }
