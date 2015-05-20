@@ -105,6 +105,9 @@
 #define CS1_PWR_AD7998      0x18
 #define CS1_TEMP_EBPL       0x19
 #define CS1_JOB_RUNNER      0x1a
+#define CS1_GND_COMMANDER   0x1b
+#define CS1_NAMED_PIPES     0x1c
+#define CS1_GND_NAMED_PIPES 0x1d
 #define CS1_UNDEF_SUB       0xFF
 extern const char * cs1_systems[];
 
