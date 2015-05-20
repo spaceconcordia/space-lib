@@ -44,5 +44,8 @@ const char *cs1_systems[] {
    "READ-PWR-AD7998",
    "READ-TEMP-EBPL",
    "JOB_RUNNER",
+   "GROUND_COMMANDER",
+   "NAMED_PIPES",
+   "GROUND_NAMED_PIPES",
    "CS1_UNDEF_SUB"
 };
