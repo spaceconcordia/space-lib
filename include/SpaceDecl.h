@@ -66,7 +66,9 @@
 // Buffer sizes
 #define CS1_MAX_FRAME_SIZE 190
 #define CS1_MAX_LOG_FILE_SIZE 1024 // bytes
-#define CS1_MAX_LOG_ENTRY 255
+#define CS1_MAX_LOG_ENTRY 255 // TODO append size
+#define CS1_MAX_CMD_RESULT_HEADER_SIZE 7
+#define NET2COM_MAX_INFO_BUFFER_SIZE 255 // TODO (CS1_MAX_FRAME_SIZE + 17) // 17 is arbitrary padding
 
 #define BE 1
 #define LE 0
@@ -110,6 +112,12 @@
 #define CS1_GND_NAMED_PIPES 0x1d
 #define CS1_UNDEF_SUB       0xFF
 extern const char * cs1_systems[];
+
+// Net2Com Config
+#define NET2COM_SESSION_ESTABLISHED             252 
+#define NET2COM_SESSION_END_CMD_CONFIRMATION    253 
+#define NET2COM_SESSION_END_TIMEOUT             254
+#define NET2COM_SESSION_END_BY_OTHER_HOST       255
 
 // Commander Config
 #define COMMANER_SLEEP_TIME 1       // seconds
