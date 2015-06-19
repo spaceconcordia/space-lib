@@ -64,12 +64,45 @@ TEST(UtlsTestGroup, UTestUtls_CreateFileOfSize_success)
 *
 * GROUP : SpaceStringTestGroup 
 *
+* NAME  : get2Char_outBufIsNull_returnsNull
+* 
+*-----------------------------------------------------------------------------*/
+TEST(SpaceStringTestGroup, get2Char_outBufIsNull_returnsNull) {
+    char* expected = 0;
+    unsigned short ushort = 0xABCD;
+
+    char* actual = SpaceString::get2Char(NULL, ushort);
+
+    CHECK_EQUAL(expected, actual);
+}
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+* GROUP : SpaceStringTestGroup 
+*
+* NAME  : get2Char_outBufNotNull_success
+* 
+*-----------------------------------------------------------------------------*/
+TEST(SpaceStringTestGroup, get2Char_outBufNotNull_success) {
+    char expected_cstr[2] = { (char) 0xCD, (char) 0xAB };
+    char actual[4] = {0};
+    unsigned short ushort = 0xABCD;
+
+    SpaceString::get2Char(actual, ushort);
+
+    CHECK_EQUAL(memcmp(expected_cstr, actual, 2), 0);
+}
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+* GROUP : SpaceStringTestGroup 
+*
 * NAME  : get4Char_returnCorrectCStr
 * 
 *-----------------------------------------------------------------------------*/
 TEST(SpaceStringTestGroup, get4Char_returnCorrectCStr)
 {
-    char expected_cstr[4] = { 0x00, 0xEF, 0xCD, 0xAB };
+    char expected_cstr[4] = { (char) 0x00, (char) 0xEF, (char) 0xCD, (char) 0xAB };
     char cstr[4] = {0};
     size_t uint = 2882400000LL;
 
@@ -86,7 +119,7 @@ TEST(SpaceStringTestGroup, get4Char_returnCorrectCStr)
 *-----------------------------------------------------------------------------*/
 TEST(SpaceStringTestGroup, getUInt_returnCorrectIntegerValue)
 {
-    char cstr[4] = { 0x00, 0xEF, 0xCD, 0xAB };
+    char cstr[4] = { (char) 0x00, (char) 0xEF, (char) 0xCD, (char) 0xAB };
     size_t expected = 2882400000LL;
 
     size_t actual = SpaceString::getUInt(cstr);

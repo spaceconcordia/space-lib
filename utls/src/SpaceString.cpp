@@ -20,6 +20,24 @@
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
+ * NAME : get2Char
+ * 
+ * PURPOSE : Converts an unsigned short to a 2 bytes char array
+ *
+ *-----------------------------------------------------------------------------*/
+char* SpaceString::get2Char(char out_buf[2], unsigned short ushort) {
+    Converter_ushort_2char converter = {0};    
+    
+    if (out_buf) {
+        converter.ushort = ushort;
+        memcpy(out_buf, converter.cstr, 4);
+    }
+
+    return out_buf;
+}
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
  * NAME : getUInt
  * 
  * PURPOSE : Converts a 4 byte char sequence to an unsigned integer
