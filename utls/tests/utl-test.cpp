@@ -73,7 +73,7 @@ TEST(SpaceStringTestGroup, get2Char_outBufIsNull_returnsNull) {
 
     char* actual = SpaceString::get2Char(NULL, ushort);
 
-    CHECK_EQUAL(actual, expected);
+    CHECK_EQUAL(expected, actual);
 }
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
