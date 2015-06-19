@@ -22,7 +22,7 @@
  *
  * NAME : get2Char
  * 
- * PURPOSE : Converts an unsigned short tot a 2 bytes char array
+ * PURPOSE : Converts an unsigned short to a 2 bytes char array
  *
  *-----------------------------------------------------------------------------*/
 char* SpaceString::get2Char(char out_buf[2], unsigned short ushort) {
