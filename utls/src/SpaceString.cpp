@@ -20,6 +20,23 @@
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
+ * NAME : getUShort
+ * 
+ * PURPOSE : Converts a 2 bytes char sequence to an unsigned short
+ *
+ *-----------------------------------------------------------------------------*/
+unsigned short SpaceString::getUShort(const char cstr[2])
+{
+    Converter_ushort_2char converter = {0};    
+
+    if (cstr) {
+        memcpy(converter.cstr, cstr, 2);
+    }
+
+    return converter.ushort;
+}
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
  * NAME : get2Char
  * 
  * PURPOSE : Converts an unsigned short to a 2 bytes char array

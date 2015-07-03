@@ -32,6 +32,7 @@ public:
     static char* get2Char(char out[2], unsigned short ushort);
     static char* get4Char(char char_buf[4], unsigned int uint);
     static size_t getUInt(const char cstr[4]);
+    static unsigned short getUShort(const char cstr[2]);
     static char* BuildPath(char *path_buf, const char *dir, const char *file);
     static char* getTimetInChar(char char_buf[sizeof(time_t)], time_t time);
     static time_t getTimet(const char cstr[sizeof(time_t)]);

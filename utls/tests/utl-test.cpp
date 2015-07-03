@@ -39,6 +39,15 @@ TEST_GROUP(UtlsTestGroup)
     }
 };
 
+TEST_GROUP(DateTestGroup)
+{
+    void setup() {
+    }
+    void teardown() {
+    }
+};
+
+
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
@@ -110,6 +119,22 @@ TEST(SpaceStringTestGroup, get4Char_returnCorrectCStr)
 
     CHECK_EQUAL(memcmp(expected_cstr, cstr, 4), 0);
 }
+
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*
+* NAME : SpaceStringTestGroup :: getUShort_returnCorrectShortValue
+*
+*-----------------------------------------------------------------------------*/
+TEST(SpaceStringTestGroup, getUShort_returnCorrectShortValue)
+{
+    char cstr[2] = { (char) 0xCD, (char) 0xAB };
+    unsigned short expected = 0xABCD;
+
+    unsigned short actual = SpaceString::getUShort(cstr);
+
+    CHECK_EQUAL(expected, actual);
+}
+
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
 * NAME : SpaceStringTestGroup :: getUInt_returnCorrectIntegerValue
@@ -126,14 +151,6 @@ TEST(SpaceStringTestGroup, getUInt_returnCorrectIntegerValue)
 
     CHECK_EQUAL(expected, actual);
 }
-
-TEST_GROUP(DateTestGroup)
-{
-    void setup() {
-    }
-    void teardown() {
-    }
-};
 
 /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *
