@@ -175,6 +175,78 @@ namespace Shakespeare
         fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
+    
+    	// TODO open and close file, requires passing log file path
+    int log_csv(FILE* lf, Priority ePriority, string process, string msg) 
+    {
+        if ( lf == NULL ) 
+        {
+           return CS1_NULL_FILE_POINTER;
+        }
+        fflush(lf);
+
+		//check for comma
+		//check of empty document
+
+        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        return 0;
+    }
+
+	//read each line from file and write to csv file
+	int log_file_csv(FILE* lf)
+	{
+		if ( lf == NULL ) 
+        {
+           return CS1_NULL_FILE_POINTER;
+        }
+
+		Priority ePriority;
+		string process;
+		string msg;
+
+		while (file is good){
+
+			bit binary = 1;
+			std::string str = line;
+
+			char * pch;
+			pch = (char*) memchr (line, ':', strlen(line));
+			if (pch!=NULL) { //ACSII
+				binary = 0;			
+			}
+
+			else {
+				if ( 
+			
+			}
+
+			if (binary == 0) {  //ACSII
+				//if acsii, catch first 8 bytes, convert to readable date.
+			}
+			
+			if (binary == 1) {  //binary
+
+			}			
+
+			log_csv(lf, somepriority, someprocess, some msg);			
+
+			/*
+			ASCII encoded log entry structure:
+			[timestamp (8 bytes - char)] [ProcessName - char *] [Priority - char *] [Message - char *]
+			Binary log entry structure:
+			[timestamp (time_t - 8 bytes on 64-bit systems, 4 bytes on 32-bit systems)] [ProcessID (char - 1 byte)] [PriorityID (char - 1 byte)] [Binary Value (short int - 2 bytes)]
+			*/	
+
+			/*
+			Date time(entry.date_time,1);
+			fprintf ( output_file,
+            "Time:%s Subsystem:%d Priority:%s Value:%d\n",
+            time.GetDateTimeString(), entry.subsystem, priorities[entry.priority].c_str(), entry.data
+			);			
+			*/
+		}
+		return 0;	
+	}
 
     // faster method to make log entries
     int log_shorthand(string log_folder, Priority logPriority, string process, string msg) 
