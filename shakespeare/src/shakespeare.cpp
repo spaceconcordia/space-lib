@@ -184,16 +184,12 @@ namespace Shakespeare
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-
-		//check for comma
-		//check of empty document
-
-        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%u:%s:%s:%s,\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
 
 	//read each line from file and write to csv file
-	int log_file_csv(FILE* lf)
+    	int log_file_csv(FILE* lf) {
 	{
 		if ( lf == NULL ) 
         {
