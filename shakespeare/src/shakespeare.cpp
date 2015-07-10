@@ -228,22 +228,7 @@ namespace Shakespeare
 
 			}			
 
-			log_csv(lf, somepriority, someprocess, some msg);			
-
-			/*
-			ASCII encoded log entry structure:
-			[timestamp (8 bytes - char)] [ProcessName - char *] [Priority - char *] [Message - char *]
-			Binary log entry structure:
-			[timestamp (time_t - 8 bytes on 64-bit systems, 4 bytes on 32-bit systems)] [ProcessID (char - 1 byte)] [PriorityID (char - 1 byte)] [Binary Value (short int - 2 bytes)]
-			*/	
-
-			/*
-			Date time(entry.date_time,1);
-			fprintf ( output_file,
-            "Time:%s Subsystem:%d Priority:%s Value:%d\n",
-            time.GetDateTimeString(), entry.subsystem, priorities[entry.priority].c_str(), entry.data
-			);			
-			*/
+			log_csv(lf, somepriority, someprocess, some msg);
 		}
 		return 0;	
 	}
