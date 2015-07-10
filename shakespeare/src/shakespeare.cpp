@@ -176,7 +176,7 @@ namespace Shakespeare
         return 0;
     }
     
-    	// TODO open and close file, requires passing log file path
+    // logs into csv
     int log_csv(FILE* lf, string date, Priority ePriority, string process, string msg) 
     {
         if ( lf == NULL ) 
@@ -188,8 +188,9 @@ namespace Shakespeare
         return 0;
     }
 
-	//read each line from file and write to csv file
-    	int log_file_csv(FILE* lf) {
+    //read from file, write to csv
+    int log_file_csv(FILE* lf) 
+    {
 	{
 		if ( lf == NULL ) 
         {
@@ -200,26 +201,26 @@ namespace Shakespeare
 		string msg;
 		string date;
 		char* line;
-		bool binary;
 		
 		while (lf.fget(line, 200, lf) != NULL){
-			binary = binary_ascii_check(line);
-			if (binary) {
-				binary_log_check(line, date, priority, process, message);
+			if (binary_ascii_check(line)) {
+				binary_log_check(line, &date, &priority, &process, &message);
 			}
 			else {
-				ascii_log_check(line, date, priority, process, message);			
+				ascii_log_check(line, &date, &priority, &process, &message);			
 			}
-			log_csv(lf, &priority, &process, &msg);
+			log_csv(lf, date, priority, process, msg);
 		}
 		return 0;	
 	}
 	
+	//checks for :
 	bool binary_ascii_check(char * line){
-		//if ascii
-		
+  		if (strchr(line,':') != NULL)
+			return false;
 		//if binary
-		return true;
+		else
+			return true;
 	}
 	
 	int binary_log_check(char * line, string &date, Priority &priority, string &process, string &message) {
