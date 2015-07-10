@@ -195,38 +195,38 @@ namespace Shakespeare
         {
            return CS1_NULL_FILE_POINTER;
         }
-
-		Priority ePriority;
+		Priority priority;
 		string process;
 		string msg;
-
-		while (file is good){
-
-			bit binary = 1;
-			std::string str = line;
-
-			char * pch;
-			pch = (char*) memchr (line, ':', strlen(line));
-			if (pch!=NULL) { //ACSII
-				binary = 0;			
+		char* line;
+		bool binary;
+		
+		while (lf.fget(line, 200, lf) != NULL){
+			 binary = binary_ascii_check(line);
+			if (binary) {
+				
 			}
-
 			else {
-				if ( 
 			
 			}
-
-			if (binary == 0) {  //ACSII
-				//if acsii, catch first 8 bytes, convert to readable date.
-			}
-			
-			if (binary == 1) {  //binary
-
-			}			
-
-			log_csv(lf, somepriority, someprocess, some msg);
+			log_csv(lf, &priority, &process, &msg);
 		}
 		return 0;	
+	}
+	
+	bool binary_ascii_check(char * line){
+		//if ascii
+		
+		//if binary
+		return true;
+	}
+	
+	int binary_log_check(char * line, Priority & priority, string &process, string &message) {
+		
+	}
+	
+	int ascii_log_check(char * line, Priority & priority, string &process, string &message)  {
+		
 	}
 
     // faster method to make log entries
