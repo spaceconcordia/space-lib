@@ -177,14 +177,14 @@ namespace Shakespeare
     }
     
     	// TODO open and close file, requires passing log file path
-    int log_csv(FILE* lf, Priority ePriority, string process, string msg) 
+    int log_csv(FILE* lf, string date, Priority ePriority, string process, string msg) 
     {
         if ( lf == NULL ) 
         {
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%u:%s:%s:%s,\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%s:%s:%s:%s,\r\n", date.c_str(), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
 
@@ -198,16 +198,17 @@ namespace Shakespeare
 		Priority priority;
 		string process;
 		string msg;
+		string date;
 		char* line;
 		bool binary;
 		
 		while (lf.fget(line, 200, lf) != NULL){
-			 binary = binary_ascii_check(line);
+			binary = binary_ascii_check(line);
 			if (binary) {
-				
+				binary_log_check(line, date, priority, process, message);
 			}
 			else {
-			
+				ascii_log_check(line, date, priority, process, message);			
 			}
 			log_csv(lf, &priority, &process, &msg);
 		}
@@ -221,12 +222,35 @@ namespace Shakespeare
 		return true;
 	}
 	
-	int binary_log_check(char * line, Priority & priority, string &process, string &message) {
+	int binary_log_check(char * line, string &date, Priority &priority, string &process, string &message) {
+		//check length;
+		//if (twelve bytes)
+			char * date_char = strcpy(line, date, 8);
+			int date_int  = atoi(date);
+			tm* timeptr = new tm(date_int);
+			strftime (date, 100, "%D %T", timeptr);
 		
+		//if (8 bytes)
+			char * date_char = strcpy(line, date, 4);
+			int date_int  = atoi(date);
+			tm* timeptr = new tm(date_int);
+			strftime (date, 100, "%D %T", timeptr);
 	}
 	
-	int ascii_log_check(char * line, Priority & priority, string &process, string &message)  {
+	int ascii_log_check(char * line, string &date, Priority &priority, string &process, string &message)  {
+		//first 8 bytes
+		//get first :
+		char * date_char = strcpy(line, date, 8);
+		int date_int  = atoi(date);
+		tm* timeptr = new tm(date_int);
+		strftime (date, 100, "%D %T", timeptr);
 		
+		//priority
+		
+		//process
+		
+		//string
+		return CS1_SUCCESS;
 	}
 
     // faster method to make log entries
