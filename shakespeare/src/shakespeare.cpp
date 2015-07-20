@@ -177,82 +177,182 @@ namespace Shakespeare
     }
     
     // logs into csv
-    int log_csv(FILE* lf, string date, Priority ePriority, string process, string msg) 
+    int log_csv(FILE* lf, string date, string ePriority, string process, string msg)
     {
-        if ( lf == NULL ) 
+        if (lf == NULL)
         {
-           return CS1_NULL_FILE_POINTER;
+            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%s:%s:%s:%s,\r\n", date.c_str(), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%s:%s:%s:%s,\r\n", date.c_str(), ePriority.c_str(), process.c_str(), msg.c_str());
+        return 0;
+    }
+
+    //returns true if binary, false for ascii
+    bool binary_ascii_check(char * line){
+        bool binary = false;
+        for (int i = 0; i < strlen(line) && line[i] != '\n'; ++i) {
+            int char_int = (int)line[i];
+            if((int)line[i] >= 128 || (int)line[i] < 0)
+                binary = true;
+        }
+        return binary;
+    }
+
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+        int size = sizeof(line);
+        //TODO: check 64, 32 bit system difference        
+        //date 32 bit
+        time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
+
+        tm * ptm = localtime(&time);
+        char* c_date = new char[32];
+        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
+        date = string(c_date);
+        //process
+        int process_int = (int) line[8];
+        //priority
+        int priority_int = (int) line[9];
+        //message
+        //7th and 8th char
+        uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
+
+        //format strings
+        date = string(c_date);
+        priority = priorities[priority_int];
+        process = to_string(process_int);
+        message = to_string(message_int);
+        return 0;
+    }
+
+    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  {
+        int index;
+
+        //date
+        for (index = 0; index < strlen(line) && line[index] != ':'; ++index) {
+        }
+        char * date_char = new char[index+1];
+        for (int i = 0; i < index; ++i) {
+            date_char[i] = NULL;
+        }
+        for (int i = 0; i < index; ++i){
+            date_char[i] = line[i];
+        }
+        date_char[index] = '\0';
+
+        //do a check here
+        time_t date_int = (time_t)atol(date_char);
+        tm * ptm = localtime(&date_int);
+        char* c_date = new char[32];
+        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
+
+        //priority
+        int oldindex = ++index;
+        for (index; index < strlen(line) && line[index] != ':'; ++index) {
+        }
+        char * priority_char = new char[index-oldindex];
+        for (int i = oldindex; i < index; ++i) {
+            priority_char[i - oldindex] = line[i];
+        }
+        priority_char[index - oldindex] = '\0';
+
+        //process
+        oldindex = ++index;
+        for (index; index < strlen(line) && line[index] != ':'; ++index) {
+        }
+        char * process_char = new char[index-oldindex];
+        for (int i = oldindex; i < index; ++i) {
+            process_char[i - oldindex] = line[i];
+        }
+        process_char[index - oldindex] = '\0';
+
+        //message
+        ++index;
+        char * message_char = new char[strlen(line) - index];
+        for (int i = index; i < strlen(line); ++i) {
+            message_char[i - index] = line[i];
+        }
+        message_char[strlen(line) - index] = '\0';
+
+        //do a switch for the priorities
+        date = string(c_date);
+        priority = string(priority_char);
+        process = string(process_char);
+        message = string(message_char);       
+
         return 0;
     }
 
     //read from file, write to csv
-    int log_file_csv(FILE* lf) 
+    int log_file_csv(FILE* lf, FILE* csv)
     {
-	{
-		if ( lf == NULL ) 
+       if (lf == NULL)
+       {
+            return CS1_NULL_FILE_POINTER;
+       }
+       string priority;
+       string process;
+       string message;
+       string date;
+
+       char line[200];
+	   char test[17];
+       while (fgets(test, 17, lf)){
+            if (binary_ascii_check(test)) {
+                    //format binary string
+                for (int i = 0; i < 8; ++i) {
+                    if (test[i] == '\0'){
+                        test[i] = ' ';
+                    }                
+                }
+                    binary_log_check(test, date, priority, process, message);
+                }
+            else {
+				fseek(lf, -16, SEEK_CUR);
+				fgets(line, 200, lf);
+                ascii_log_check(line, date, priority, process, message);
+                }
+            log_csv(csv, date, priority, process, message);
+       }
+            return 0;     
+    }
+
+    typedef struct {
+        time_t     date_time;
+        uint8_t subsystem;
+        uint8_t    priority;
+        uint16_t    data;
+    } BinaryLogEntry;
+
+    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) 
+    {
+        size_t expected_num_elements = 4;
+        if (lf==NULL) 
         {
-           return CS1_NULL_FILE_POINTER;
+            return CS1_NULL_FILE_POINTER;
         }
-		Priority priority;
-		string process;
-		string msg;
-		string date;
-		char* line;
-		
-		while (lf.fget(line, 200, lf) != NULL){
-			if (binary_ascii_check(line)) {
-				binary_log_check(line, &date, &priority, &process, &message);
-			}
-			else {
-				ascii_log_check(line, &date, &priority, &process, &message);			
-			}
-			log_csv(lf, date, priority, process, msg);
-		}
-		return 0;	
-	}
-	
-	//checks for :
-	bool binary_ascii_check(char * line){
-  		if (strchr(line,':') != NULL)
-			return false;
-		//if binary
-		else
-			return true;
-	}
-	
-	int binary_log_check(char * line, string &date, Priority &priority, string &process, string &message) {
-		//check length;
-		//if (twelve bytes)
-			char * date_char = strcpy(line, date, 8);
-			int date_int  = atoi(date);
-			tm* timeptr = new tm(date_int);
-			strftime (date, 100, "%D %T", timeptr);
-		
-		//if (8 bytes)
-			char * date_char = strcpy(line, date, 4);
-			int date_int  = atoi(date);
-			tm* timeptr = new tm(date_int);
-			strftime (date, 100, "%D %T", timeptr);
-	}
-	
-	int ascii_log_check(char * line, string &date, Priority &priority, string &process, string &message)  {
-		//first 8 bytes
-		//get first :
-		char * date_char = strcpy(line, date, 8);
-		int date_int  = atoi(date);
-		tm* timeptr = new tm(date_int);
-		strftime (date, 100, "%D %T", timeptr);
-		
-		//priority
-		
-		//process
-		
-		//string
-		return CS1_SUCCESS;
-	}
+
+        fflush(lf);
+        time_t itime;
+        time(&itime);
+        size_t elements_written = 0;
+
+        size_t log_entry_padding = sizeof(BinaryLogEntry) - ( sizeof(time_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) );
+
+        elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
+        elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
+        elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
+        elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
+
+        if (log_entry_padding > 0) 
+        {
+            expected_num_elements=5;
+            elements_written = elements_written + fwrite("\0", log_entry_padding, 1, lf);
+        }
+
+        fflush(lf);
+        return (elements_written == expected_num_elements) ? 0 : 1;
+    }
 
     // faster method to make log entries
     int log_shorthand(string log_folder, Priority logPriority, string process, string msg) 
