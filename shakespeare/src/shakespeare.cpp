@@ -191,16 +191,18 @@ namespace Shakespeare
     //returns true if binary, false for ascii
     bool binary_ascii_check(char * line){
         bool binary = false;
-        for (int i = 0; i < strlen(line) && line[i] != '\n'; ++i) {
+	size_t i;
+        for (i = 0; i < strlen(line) && line[i] != '\n'; ++i) {
             int char_int = (int)line[i];
-            if((int)line[i] >= 128 || (int)line[i] < 0)
+            if (char_int >= 128 || char_int < 0){
                 binary = true;
+	    }
         }
         return binary;
     }
 
     int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
-        int size = sizeof(line);
+        // int size = sizeof(line);
         //TODO: check 64, 32 bit system difference        
         //date 32 bit
         time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
@@ -210,9 +212,9 @@ namespace Shakespeare
         strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
         date = string(c_date);
         //process
-        int process_int = (int) line[8];
+        char* process_int = (int) line[8];
         //priority
-        int priority_int = (int) line[9];
+        char* priority_int = (int) line[9];
         //message
         //7th and 8th char
         uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
@@ -220,22 +222,22 @@ namespace Shakespeare
         //format strings
         date = string(c_date);
         priority = priorities[priority_int];
-        process = to_string(process_int);
-        message = to_string(message_int);
+        process = string(process_int);
+        message = string(message_int);
         return 0;
     }
 
     int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  {
-        int index;
-
+        size_t index;
+	size_t i;
         //date
         for (index = 0; index < strlen(line) && line[index] != ':'; ++index) {
         }
         char * date_char = new char[index+1];
-        for (int i = 0; i < index; ++i) {
-            date_char[i] = NULL;
+        for (i = 0; i < index; ++i) {
+            date_char[i] = ' ';
         }
-        for (int i = 0; i < index; ++i){
+        for (i = 0; i < index; ++i){
             date_char[i] = line[i];
         }
         date_char[index] = '\0';
@@ -247,21 +249,21 @@ namespace Shakespeare
         strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
 
         //priority
-        int oldindex = ++index;
-        for (index; index < strlen(line) && line[index] != ':'; ++index) {
+        size_t oldindex = ++index;
+        for (; index < strlen(line) && line[index] != ':'; ++index) {
         }
         char * priority_char = new char[index-oldindex];
-        for (int i = oldindex; i < index; ++i) {
+        for (i = oldindex; i < index; ++i) {
             priority_char[i - oldindex] = line[i];
         }
         priority_char[index - oldindex] = '\0';
 
         //process
         oldindex = ++index;
-        for (index; index < strlen(line) && line[index] != ':'; ++index) {
+        for (; index < strlen(line) && line[index] != ':'; ++index) {
         }
         char * process_char = new char[index-oldindex];
-        for (int i = oldindex; i < index; ++i) {
+        for (i = oldindex; i < index; ++i) {
             process_char[i - oldindex] = line[i];
         }
         process_char[index - oldindex] = '\0';
@@ -269,7 +271,7 @@ namespace Shakespeare
         //message
         ++index;
         char * message_char = new char[strlen(line) - index];
-        for (int i = index; i < strlen(line); ++i) {
+        for (i = index; i < strlen(line); ++i) {
             message_char[i - index] = line[i];
         }
         message_char[strlen(line) - index] = '\0';
@@ -296,7 +298,7 @@ namespace Shakespeare
        string date;
 
        char line[200];
-	   char test[17];
+       char test[17];
        while (fgets(test, 17, lf)){
             if (binary_ascii_check(test)) {
                     //format binary string
@@ -315,43 +317,6 @@ namespace Shakespeare
             log_csv(csv, date, priority, process, message);
        }
             return 0;     
-    }
-
-    typedef struct {
-        time_t     date_time;
-        uint8_t subsystem;
-        uint8_t    priority;
-        uint16_t    data;
-    } BinaryLogEntry;
-
-    int log_bin(FILE* lf, Priority ePriority, uint8_t process_id, short int data) 
-    {
-        size_t expected_num_elements = 4;
-        if (lf==NULL) 
-        {
-            return CS1_NULL_FILE_POINTER;
-        }
-
-        fflush(lf);
-        time_t itime;
-        time(&itime);
-        size_t elements_written = 0;
-
-        size_t log_entry_padding = sizeof(BinaryLogEntry) - ( sizeof(time_t) + sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) );
-
-        elements_written = elements_written + fwrite(&itime,        sizeof(time_t), 1,lf);
-        elements_written = elements_written + fwrite(&process_id,   sizeof(uint8_t),1,lf); 
-        elements_written = elements_written + fwrite(&ePriority,    sizeof(uint8_t),1,lf);
-        elements_written = elements_written + fwrite(&data,         sizeof(uint16_t),1,lf);
-
-        if (log_entry_padding > 0) 
-        {
-            expected_num_elements=5;
-            elements_written = elements_written + fwrite("\0", log_entry_padding, 1, lf);
-        }
-
-        fflush(lf);
-        return (elements_written == expected_num_elements) ? 0 : 1;
     }
 
     // faster method to make log entries
