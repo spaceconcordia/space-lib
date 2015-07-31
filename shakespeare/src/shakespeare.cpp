@@ -278,7 +278,9 @@ namespace Shakespeare
         for (i = index; i < strlen(line); ++i) {
             message_char[i - index] = line[i];
         }
-        message_char[strlen(line) - index] = '\0';
+        
+        //remove the \n\r, two chars
+        message_char[strlen(line) - (index-2)] = '\0';
 
         //do a switch for the priorities
         date = string(c_date);
