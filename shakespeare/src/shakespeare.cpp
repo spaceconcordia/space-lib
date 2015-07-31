@@ -11,6 +11,7 @@
 #include <string>
 #include <cstring> // TODO use only string functions!!
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
 #include <SpaceDecl.h>
@@ -172,7 +173,7 @@ namespace Shakespeare
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%u,%s,%s,%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
     
@@ -184,7 +185,7 @@ namespace Shakespeare
             return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%s:%s:%s:%s,\r\n", date.c_str(), ePriority.c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%s,%s,%s,%s,\r\n", date.c_str(), ePriority.c_str(), process.c_str(), msg.c_str());
         return 0;
     }
 
@@ -209,21 +210,24 @@ namespace Shakespeare
 
         tm * ptm = localtime(&time);
         char* c_date = new char[32];
-        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
+        strftime(c_date, 32, "%Y/%m/%d %H:%M:%S", ptm);
         date = string(c_date);
         //process
-        char* process_int = (int) line[8];
+        int process_int = (int) line[8];
         //priority
-        char* priority_int = (int) line[9];
+        int priority_int = (int) line[9];
         //message
         //7th and 8th char
         uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
-
+	ostringstream convert;
+	convert << process_int;
         //format strings
         date = string(c_date);
         priority = priorities[priority_int];
-        process = string(process_int);
-        message = string(message_int);
+
+        process = convert.str();
+	convert << message_int;
+        message = convert.str();
         return 0;
     }
 
@@ -246,7 +250,7 @@ namespace Shakespeare
         time_t date_int = (time_t)atol(date_char);
         tm * ptm = localtime(&date_int);
         char* c_date = new char[32];
-        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
+        strftime(c_date, 32, "%Y/%m/%d %H:%M:%S", ptm);
 
         //priority
         size_t oldindex = ++index;
