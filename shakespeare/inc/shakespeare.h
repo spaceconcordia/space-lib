@@ -72,5 +72,11 @@ namespace Shakespeare
     int binary_file_size(ifstream bf);
     BinaryLogEntry read_bin_entry(string filename, streampos entryPosition);
     int print_binary_entry(FILE * output_file, BinaryLogEntry entry);
+    
+    int log_csv(FILE* lf, string date, string ePriority, string process, string msg);
+    bool binary_ascii_check(char * line);
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message);
+    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message);
+    int log_file_csv(FILE* lf, FILE* csv);
 }
 #endif	/* SHAKESPEARE_H */
