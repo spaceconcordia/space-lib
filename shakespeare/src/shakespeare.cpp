@@ -206,17 +206,24 @@ namespace Shakespeare
 	if (a < 0)
 		a += 256;
     }
+    
+    inline void timet_to_date_string(time_t time, string &date_string) {
+	tm * ptm = localtime(&time);
+	char * c_date = new  char[32];
+	strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
+	date_string = string(c_date);
+
+	delete ptm;
+    } 
 
     int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
 	
-	int sys_bit = sizeof(time_t);
+//	int sys_bit = sizeof(time_t);
 
 	//TODO endian check, 32 bit, 64 bit check
 	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
-	tm * ptm = localtime(&time);
-	char* c_date = new char[32];
-	strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
-	date = string(c_date);
+	
+	timet_to_date_string(time, date);
 
 	//process
 	int process_int = (int) line[8];
@@ -261,11 +268,9 @@ namespace Shakespeare
         string date_raw = entry.substr(0, index);
 
         //do a check here
-        time_t date_int = (time_t)atol(date_raw.c_str());
-        tm * ptm = localtime(&date_int);
-        char* c_date = new char[32];
-        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
-	date = string(c_date);
+        time_t time = (time_t)atol(date_raw.c_str());
+	
+	timet_to_date_string(time, date);
 
 	//priority
         unsigned int base = ++index;
