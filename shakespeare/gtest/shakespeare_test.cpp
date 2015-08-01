@@ -252,7 +252,13 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
 
 TEST_F(Shakespeare_Test, IntegratedLogCSV)
 {
+   FILE * binary_ascii_log = fopen("log.log", "a");
+   log_bin(log, Priority::DEBUG, 12, 12002);
+   binary_ascii_log.close();
 
+
+   binary_ascii_log = fopen("log.log", "r");
+   
 
 
 
