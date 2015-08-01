@@ -201,7 +201,7 @@ namespace Shakespeare
         return binary;
     }
 
-	int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
 
 	//TODO endian check, 32 bit, 64 bit check
 	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));

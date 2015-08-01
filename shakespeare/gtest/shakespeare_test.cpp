@@ -159,7 +159,7 @@ TEST_F(Shakespeare_Test, Binary)
 
 
 // try to fetch an entry when not enough bytes are available at the end of the file
-/*  
+/* 
 TEST_F(Shakespeare_Test, BinaryFileOutOfBounds) 
 {
    FAIL(); 
@@ -175,12 +175,18 @@ TEST_F(Shakespeare_Test, IncompleteBinaryEntry)
 */
 
 // Prevent writing binary to ascii file and visa-versa
-/*
+
 TEST_F(Shakespeare_Test, CatchBinaryAscii) 
 {
-   FAIL(); 
+   bool binary;
+
+   char * test_entry = "1438446858:WARNING:test_process:test_message";
+   binary = Shakespeare::binary_ascii_check(test_entry);
+   ASSERT_EQ(binary, false);
+
+//   FAIL();
 }
-*/
+
 
 TEST_F(Shakespeare_Test, NullFilePointer)
 {
