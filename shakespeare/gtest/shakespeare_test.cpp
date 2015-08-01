@@ -168,6 +168,7 @@ TEST_F(Shakespeare_Test, BinaryFileOutOfBounds)
 
 // catch an incomplete entry, log/report the event, and read next available 
 /*
+
 TEST_F(Shakespeare_Test, IncompleteBinaryEntry) 
 {
    FAIL(); 
@@ -179,14 +180,83 @@ TEST_F(Shakespeare_Test, IncompleteBinaryEntry)
 TEST_F(Shakespeare_Test, CatchBinaryAscii) 
 {
    bool binary;
-
-   char * test_entry = "1438446858:WARNING:test_process:test_message";
+   char * test_entry = "1438446858:WARNING:test_process:test_message\0";
    binary = Shakespeare::binary_ascii_check(test_entry);
    ASSERT_EQ(binary, false);
-
-//   FAIL();
 }
 
+TEST_F(Shakespeare_Test, AsciiCheck)
+{
+   string date = "";
+   string process = "";
+   string priority = "";
+   string message = "";
+
+   char * test_entry = "1438447049:WARNING:test_process:test_message\0";
+
+   int returned_int = Shakespeare::ascii_log_check(test_entry, date, priority, process, message); 
+   ASSERT_EQ(date,"20150801 16:37:29");
+   ASSERT_EQ(priority,"WARNING");
+   ASSERT_EQ(process, "test_process");
+   ASSERT_EQ(message, "test_message");
+   ASSERT_EQ(CS1_SUCCESS, returned_int);
+}
+
+TEST_F(Shakespeare_Test, BinaryCheck) {
+   string date = "";
+   string process = "";
+   string priority = "";
+   string message = "";
+
+   char * test_entry = new char[17];
+
+   //time_t
+   test_entry[0] = (char) -79;
+   test_entry[1] = (char) -11;
+   test_entry[2] = (char) -68;
+   test_entry[3] = (char) 85;
+   test_entry[4] = ' ';
+   test_entry[5] = ' ';
+   test_entry[6] = ' ';
+   test_entry[7] = ' ';
+
+   //priotity 8 bit int
+   test_entry[8] = (char) 12;
+
+   //process id 8 bit int
+   test_entry[9] = (char) 2;
+
+   //message 16 bit int
+   test_entry[10]= (char) -30;
+   test_entry[11]= (char) 46;
+
+   //nothing to test here
+   test_entry[12]= '\0';
+   test_entry[13]= '\0';
+   test_entry[14]= '\0';
+   test_entry[15]= '\0';
+   test_entry[16]= '\0';
+
+   int returned_int = Shakespeare::binary_log_check(test_entry, date, priority, process, message);
+
+   ASSERT_EQ(date, "20150801 16:37:05");
+   ASSERT_EQ(priority, "DEBUG");
+   ASSERT_EQ(process, "SHAKESPEARE");
+   ASSERT_EQ(message, "12002");
+   ASSERT_EQ(CS1_SUCCESS, returned_int);
+   //cout << date << "\n";
+   //cout << priority << "\n";
+   //cout << process << "\n";
+   //cout << message << "\n";
+}
+
+TEST_F(Shakespeare_Test, IntegratedLogCSV)
+{
+
+
+
+
+}
 
 TEST_F(Shakespeare_Test, NullFilePointer)
 {
@@ -194,4 +264,5 @@ TEST_F(Shakespeare_Test, NullFilePointer)
     int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Pointer");
 
     ASSERT_EQ(CS1_NULL_FILE_POINTER,result);
+
 }

@@ -202,9 +202,15 @@ namespace Shakespeare
         return binary;
     }
 
-    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+    inline void signed_to_unsigned_binary(int &a) {
+	if (a < 0)
+		a += 256;
+    }
 
-<<<<<<< HEAD
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+	
+	int sys_bit = sizeof(time_t);
+
 	//TODO endian check, 32 bit, 64 bit check
 	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
 	tm * ptm = localtime(&time);
@@ -214,128 +220,69 @@ namespace Shakespeare
 
 	//process
 	int process_int = (int) line[8];
-	if (process_int < 0) process_int += 256;
+	signed_to_unsigned_binary(process_int); 
+
 	//priority
 	int priority_int = (int) line[9];
-	if (priority_int < 0) priority_int += 256;
+	signed_to_unsigned_binary(priority_int);
 
 	//message
-	int p1 = (int) line[10];
-	if (p1 < 0) 
-		p1 += 256;
-
-	int p2 = (int) line[11];
-	if (p2 < 0) 
-		p2 += 256;
+	int first_8bit = (int) line[11];
+	int second_8bit = (int) line[10];
+	signed_to_unsigned_binary(first_8bit);
+	signed_to_unsigned_binary(second_8bit);
 
 	//TO DO check endians
-	uint16_t message_int = (uint16_t) p2 << 8 | p1 ;
-
-	//format strings
-	ostringstream convert;
-
-	date = string(c_date);
+	uint16_t message_int = (uint16_t)first_8bit << 8 | second_8bit ;
 
 	priority = priorities[priority_int];
 
-	convert << process_int;
-	process = convert.str();
+	process = cs1_systems[process_int];
 
-	convert.str("");
-	convert.clear();
+        ostringstream convert;
 	convert << (int) message_int;
 	message = convert.str();
 
-	return 0;
-	}
-=======
-        tm * ptm = localtime(&time);
-        char* c_date = new char[32];
-        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
-        date = string(c_date);
-        //process
-        int process_int = (int) line[8];
-        //priority
-        int priority_int = (int) line[9];
-        //message
-        //7th and 8th char
-        uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
-	ostringstream convert;
-	convert << process_int;
-        //format strings
-        date = string(c_date);
-        priority = priorities[priority_int];
-
-        process = convert.str();
-	convert << message_int;
-        message = convert.str();
-        return 0;
+	return CS1_SUCCESS;
     }
->>>>>>> 64cbaa6bc5580bda931e14bd244a02f84984925a
 
-    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  {
-        size_t index;
-	size_t i;
-        //date
-        for (index = 0; index < strlen(line) && line[index] != ':'; ++index) {
+    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  
+{
+	if (line == NULL)
+		return 0;
+
+        unsigned int index;
+
+	string entry = string(line);
+	unsigned int length = entry.length();
+	
+        for (index = 0; index < length && entry[index] != ':'; ++index) {
         }
-        char * date_char = new char[index+1];
-        for (i = 0; i < index; ++i) {
-            date_char[i] = ' ';
-        }
-        for (i = 0; i < index; ++i){
-            date_char[i] = line[i];
-        }
-        date_char[index] = '\0';
+        string date_raw = entry.substr(0, index);
 
         //do a check here
-        time_t date_int = (time_t)atol(date_char);
+        time_t date_int = (time_t)atol(date_raw.c_str());
         tm * ptm = localtime(&date_int);
         char* c_date = new char[32];
         strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
+	date = string(c_date);
 
-        //priority
-        size_t oldindex = ++index;
-        for (; index < strlen(line) && line[index] != ':'; ++index) {
-        }
-        char * priority_char = new char[index-oldindex];
-        for (i = oldindex; i < index; ++i) {
-            priority_char[i - oldindex] = line[i];
-        }
-        priority_char[index - oldindex] = '\0';
+	//priority
+        unsigned int base = ++index;
+        for (index = 0; (base + index) < length && entry[base + index] != ':'; ++index)
+	{}
+        priority = entry.substr(base, index);	
+      	
+	//process
+        base = ++index + base;
+        for (index = 0; (base + index) < length && entry[base + index] != ':'; ++index)
+	{}
+	process = entry.substr(base, index);
 
-        //process
-        oldindex = ++index;
-        for (; index < strlen(line) && line[index] != ':'; ++index) {
-        }
-        char * process_char = new char[index-oldindex];
-        for (i = oldindex; i < index; ++i) {
-            process_char[i - oldindex] = line[i];
-        }
-        process_char[index - oldindex] = '\0';
-
-        //message
         ++index;
-        char * message_char = new char[strlen(line) - index];
-        for (i = index; i < strlen(line); ++i) {
-            message_char[i - index] = line[i];
-        }
-        
-	//remove the \n\r, two chars
-	for (i = 0; i < strlen(message_char); ++i) {
-		if (message_char[i] == '\r' || message_char[i] == '\n'){
-			message_char[i] = '\0';
-			break;
-		}
-	}
+	message = entry.substr(base + index, length);
 
-        //do a switch for the priorities
-        date = string(c_date);
-        priority = string(priority_char);
-        process = string(process_char);
-        message = string(message_char);       
-
-        return 0;
+        return CS1_SUCCESS;
     }
 
     //read from file, write to csv
@@ -369,7 +316,7 @@ namespace Shakespeare
                 }
             log_csv(csv, date, priority, process, message);
        }
-            return 0;     
+            return CS1_SUCCESS;     
     }
 
     // faster method to make log entries
