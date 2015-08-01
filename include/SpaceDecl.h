@@ -69,6 +69,7 @@
 #define CS1_MAX_LOG_ENTRY 255 // TODO append size
 #define CS1_MAX_CMD_RESULT_HEADER_SIZE 7
 #define NET2COM_MAX_INFO_BUFFER_SIZE 255 // TODO (CS1_MAX_FRAME_SIZE + 17) // 17 is arbitrary padding
+#define CS1_MAX_INODE_SIZE 128 // bytes
 
 #define BE 1
 #define LE 0
