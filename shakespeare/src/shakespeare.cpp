@@ -11,6 +11,7 @@
 #include <string>
 #include <cstring> // TODO use only string functions!!
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <sys/stat.h> // stat to check filesize
 #include <SpaceDecl.h>
@@ -172,7 +173,7 @@ namespace Shakespeare
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%u,%s,%s,%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
     
@@ -184,7 +185,7 @@ namespace Shakespeare
             return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%s:%s:%s:%s,\r\n", date.c_str(), ePriority.c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%s,%s,%s,%s,\r\n", date.c_str(), ePriority.c_str(), process.c_str(), msg.c_str());
         return 0;
     }
 
@@ -203,6 +204,7 @@ namespace Shakespeare
 
     int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
 
+<<<<<<< HEAD
 	//TODO endian check, 32 bit, 64 bit check
 	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
 	tm * ptm = localtime(&time);
@@ -246,6 +248,30 @@ namespace Shakespeare
 
 	return 0;
 	}
+=======
+        tm * ptm = localtime(&time);
+        char* c_date = new char[32];
+        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
+        date = string(c_date);
+        //process
+        int process_int = (int) line[8];
+        //priority
+        int priority_int = (int) line[9];
+        //message
+        //7th and 8th char
+        uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
+	ostringstream convert;
+	convert << process_int;
+        //format strings
+        date = string(c_date);
+        priority = priorities[priority_int];
+
+        process = convert.str();
+	convert << message_int;
+        message = convert.str();
+        return 0;
+    }
+>>>>>>> 64cbaa6bc5580bda931e14bd244a02f84984925a
 
     int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  {
         size_t index;
