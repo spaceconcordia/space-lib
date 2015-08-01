@@ -210,7 +210,7 @@ namespace Shakespeare
 
         tm * ptm = localtime(&time);
         char* c_date = new char[32];
-        strftime(c_date, 32, "%Y/%m/%d %H:%M:%S", ptm);
+        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
         date = string(c_date);
         //process
         int process_int = (int) line[8];
@@ -250,7 +250,7 @@ namespace Shakespeare
         time_t date_int = (time_t)atol(date_char);
         tm * ptm = localtime(&date_int);
         char* c_date = new char[32];
-        strftime(c_date, 32, "%Y/%m/%d %H:%M:%S", ptm);
+        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
 
         //priority
         size_t oldindex = ++index;
@@ -279,8 +279,13 @@ namespace Shakespeare
             message_char[i - index] = line[i];
         }
         
-        //remove the \n\r, two chars
-        message_char[strlen(line) - (index-2)] = '\0';
+	//remove the \n\r, two chars
+	for (i = 0; i < strlen(message_char); ++i) {
+		if (message_char[i] == '\r' || message_char[i] == '\n'){
+			message_char[i] = '\0';
+			break;
+		}
+	}
 
         //do a switch for the priorities
         date = string(c_date);
