@@ -201,31 +201,51 @@ namespace Shakespeare
         return binary;
     }
 
-    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
-        // int size = sizeof(line);
-        //TODO: check 64, 32 bit system difference        
-        //date 32 bit
-        time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
+	int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
 
-        tm * ptm = localtime(&time);
-        char* c_date = new char[32];
-        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
-        date = string(c_date);
-        //process
-        char* process_int = (int) line[8];
-        //priority
-        char* priority_int = (int) line[9];
-        //message
-        //7th and 8th char
-        uint16_t message_int = (uint16_t) line[11] << 8 | line[10] ;
+	//TODO endian check, 32 bit, 64 bit check
+	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
+	tm * ptm = localtime(&time);
+	char* c_date = new char[32];
+	strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
+	date = string(c_date);
 
-        //format strings
-        date = string(c_date);
-        priority = priorities[priority_int];
-        process = string(process_int);
-        message = string(message_int);
-        return 0;
-    }
+	//process
+	int process_int = (int) line[8];
+	if (process_int < 0) process_int += 256;
+	//priority
+	int priority_int = (int) line[9];
+	if (priority_int < 0) priority_int += 256;
+
+	//message
+	int p1 = (int) line[10];
+	if (p1 < 0) 
+		p1 += 256;
+
+	int p2 = (int) line[11];
+	if (p2 < 0) 
+		p2 += 256;
+
+	//TO DO check endians
+	uint16_t message_int = (uint16_t) p2 << 8 | p1 ;
+
+	//format strings
+	ostringstream convert;
+
+	date = string(c_date);
+
+	priority = priorities[priority_int];
+
+	convert << process_int;
+	process = convert.str();
+
+	convert.str("");
+	convert.clear();
+	convert << (int) message_int;
+	message = convert.str();
+
+	return 0;
+	}
 
     int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  {
         size_t index;
@@ -246,7 +266,7 @@ namespace Shakespeare
         time_t date_int = (time_t)atol(date_char);
         tm * ptm = localtime(&date_int);
         char* c_date = new char[32];
-        strftime(c_date, 32, "%d/%m/%Y %H:%M:%S", ptm);
+        strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
 
         //priority
         size_t oldindex = ++index;
@@ -274,7 +294,14 @@ namespace Shakespeare
         for (i = index; i < strlen(line); ++i) {
             message_char[i - index] = line[i];
         }
-        message_char[strlen(line) - index] = '\0';
+        
+	//remove the \n\r, two chars
+	for (i = 0; i < strlen(message_char); ++i) {
+		if (message_char[i] == '\r' || message_char[i] == '\n'){
+			message_char[i] = '\0';
+			break;
+		}
+	}
 
         //do a switch for the priorities
         date = string(c_date);
