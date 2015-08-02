@@ -124,7 +124,6 @@ TEST_F(Shakespeare_Test, Binary)
     string test_subsystem; 
     int result,i; 
     int iterations=3;
-
     string filename; // open only to keep track of it and to clean up the files after the test
     
     for (i=0;i<iterations;i++) 
@@ -192,9 +191,9 @@ TEST_F(Shakespeare_Test, AsciiCheck)
    string priority = "";
    string message = "";
 
-   char * test_entry = "1438447049:WARNING:test_process:test_message\0";
+   string test_entry = "1438447049:WARNING:test_process:test_message\0";
 
-   int returned_int = Shakespeare::ascii_log_check(test_entry, date, priority, process, message); 
+   int returned_int = Shakespeare::ascii_log_check(string(test_entry), date, priority, process, message); 
    ASSERT_EQ(date,"20150801 16:37:29");
    ASSERT_EQ(priority,"WARNING");
    ASSERT_EQ(process, "test_process");
@@ -208,7 +207,7 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
    string priority = "";
    string message = "";
 
-   char * test_entry = new char[17];
+   char test_entry[12];
 
    //time_t
    test_entry[0] = (char) -79;
@@ -230,14 +229,7 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
    test_entry[10]= (char) -30;
    test_entry[11]= (char) 46;
 
-   //nothing to test here
-   test_entry[12]= '\0';
-   test_entry[13]= '\0';
-   test_entry[14]= '\0';
-   test_entry[15]= '\0';
-   test_entry[16]= '\0';
-
-   int returned_int = Shakespeare::binary_log_check(test_entry, date, priority, process, message);
+   int returned_int = Shakespeare::binary_log_check(string(test_entry), date, priority, process, message, true);
 
    ASSERT_EQ(date, "20150801 16:37:05");
    ASSERT_EQ(priority, "DEBUG");
@@ -252,15 +244,21 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
 
 TEST_F(Shakespeare_Test, IntegratedLogCSV)
 {
-   FILE * binary_ascii_log = fopen("log.log", "a");
-   log_bin(log, Priority::DEBUG, 12, 12002);
-   binary_ascii_log.close();
+   using namespace Shakespeare;
+/*
+   FILE * write_log = fopen("log.log", "a");
+   log_bin(write_log, DEBUG, 12, 127);
+//   log_bin(write_log, NOTICE, 10, 12002);
+   log_bin(write_log, NOTICE, 10, 127);
+   fclose(write_log);
 
+*/
+   FILE * csv = fopen("csv.csv", "a");
+   FILE * log = fopen("log.log", "r");
+   log_file_csv(log, csv);
 
-   binary_ascii_log = fopen("log.log", "r");
-   
-
-
+   fclose(csv);
+   fclose(log);
 
 }
 
@@ -268,7 +266,10 @@ TEST_F(Shakespeare_Test, NullFilePointer)
 {
     FILE * nfp = NULL;
     int result = Shakespeare::log(nfp,Shakespeare::URGENT,"NullFilePointerTest","Testing NULL File Pointer");
-
     ASSERT_EQ(CS1_NULL_FILE_POINTER,result);
 
 }
+
+
+
+

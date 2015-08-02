@@ -202,65 +202,74 @@ namespace Shakespeare
         return binary;
     }
 
-    inline void signed_to_unsigned_binary(int &a) {
-	if (a < 0)
-		a += 256;
-    }
-    
-    inline void timet_to_date_string(time_t time, string &date_string) {
+    inline string timet_to_date_string(time_t time) {
 	tm * ptm = localtime(&time);
 	char * c_date = new  char[32];
 	strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
-	date_string = string(c_date);
-
-	delete ptm;
+	string date_string = string(c_date);
+	delete[] c_date;
+	return date_string;
     } 
 
-    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
-	
-//	int sys_bit = sizeof(time_t);
+    int binary_log_check(string line, string &date, string &priority, string &process, string &message, bool is_x64) {
+
+	int x64_offset = 0;
+	if (is_x64){
+		x64_offset = 4;
+	}
+for (unsigned int i = 0; i < 12; ++i) {
+	cout << "array pos: " << i << " value: " << (int)line[i] << "\n";
+}
 
 	//TODO endian check, 32 bit, 64 bit check
 	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
 	
-	timet_to_date_string(time, date);
-
-	//process
-	int process_int = (int) line[8];
-	signed_to_unsigned_binary(process_int); 
+	date = timet_to_date_string(time);
 
 	//priority
-	int priority_int = (int) line[9];
-	signed_to_unsigned_binary(priority_int);
+	uint8_t priority_int = (uint8_t) line[x64_offset + 5]; 
+
+	//process
+	uint8_t process_int = (uint8_t) line[x64_offset + 4];
 
 	//message
-	int first_8bit = (int) line[11];
-	int second_8bit = (int) line[10];
-	signed_to_unsigned_binary(first_8bit);
-	signed_to_unsigned_binary(second_8bit);
-
+	uint8_t first_8bit = (uint8_t) line[x64_offset + 7];
+	uint8_t second_8bit = (uint8_t) line[x64_offset + 6];
+        
+	cout << "priority_int" << (int) priority_int << "\n";
+	cout << "process_int" << (int)process_int << "message 2: " << "\n";
 	//TO DO check endians
 	uint16_t message_int = (uint16_t)first_8bit << 8 | second_8bit ;
+//	uint16_t message_int_2 = (uint16_t)second_8bit << 8 | first_8bit;
 
-	priority = priorities[priority_int];
-
-	process = cs1_systems[process_int];
-
+	if (priority_int >= sizeof(priorities)/sizeof(priorities[0])){
+		priority = "UNKNOWN";
+	}
+	else { 
+		priority = priorities[(int)priority_int];
+	}
+/*
+	if (process_int >= (int) strlen(*cs1_systems)) {
+		process = "UNKNOWN";
+	}
+	else {
+*/
+	process = cs1_systems[(int)process_int];
+	
         ostringstream convert;
-	convert << (int) message_int;
-	message = convert.str();
+	convert << message_int;
+	message = convert.str(); 
 
+	cout << "date: " << date << "\n";
+	cout << "priority: " << priority << "\n";
+	cout << "process: " << process << "\n";
+	cout << "message: " << message << "and   " << (int) message_int << "\n";
 	return CS1_SUCCESS;
     }
 
-    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  
-{
-	if (line == NULL)
-		return 0;
+    int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
 
         unsigned int index;
-
-	string entry = string(line);
 	unsigned int length = entry.length();
 	
         for (index = 0; index < length && entry[index] != ':'; ++index) {
@@ -270,8 +279,7 @@ namespace Shakespeare
         //do a check here
         time_t time = (time_t)atol(date_raw.c_str());
 	
-	timet_to_date_string(time, date);
-
+	date = timet_to_date_string(time);
 	//priority
         unsigned int base = ++index;
         for (index = 0; (base + index) < length && entry[base + index] != ':'; ++index)
@@ -290,38 +298,63 @@ namespace Shakespeare
         return CS1_SUCCESS;
     }
 
+    //worry about this in 2038
+    inline bool check_x64(char* bits) {
+  	if ((int)bits[4] == 0 && (int)bits[5] == 32 && (int)bits[6] == 32 && (int)bits[7] == 32) {
+		return true;
+	}
+	return false;
+    }
+
     //read from file, write to csv
     int log_file_csv(FILE* lf, FILE* csv)
     {
-       if (lf == NULL)
+       if (lf == NULL || csv == NULL)
        {
             return CS1_NULL_FILE_POINTER;
-       }
-       string priority;
-       string process;
-       string message;
-       string date;
+       };
 
-       char line[200];
-       char test[17];
-       while (fgets(test, 17, lf)){
-            if (binary_ascii_check(test)) {
-                    //format binary string
-                for (int i = 0; i < 8; ++i) {
-                    if (test[i] == '\0'){
-                        test[i] = ' ';
-                    }                
-                }
-                    binary_log_check(test, date, priority, process, message);
-                }
+  //     string priority = "";
+   //    string process = "";
+    //   string message = "";
+     //  string date = "";
+
+      // char ascii[100];
+       char binary_x64[9];
+      // char binary_x32[9];
+       
+       while (fgets(binary_x64, sizeof(binary_x64), lf)){
+		for (int i = 0; i < 9; ++i) {
+		cout << (int) binary_x64[i] << "\n";
+		}
+		cout << "end" << "\n";
+/*            if (binary_ascii_check(binary_x64)) {
+		//TODO confirm x32 or x64
+		for (int i = 0; i < 17; ++i){
+			cout << "array position: " << i << "valu " << (int) binary_x64[i] << "\n";
+		}
+
+		
+		if (!check_x64(binary_x64)){ //x32
+			cout << "we are fucking 32 32";		
+			fseek(lf, (sizeof(binary_x64)-1), SEEK_CUR);
+			fgets(binary_x32, sizeof(binary_x32), lf);
+			cout << binary_x32;
+			binary_log_check(string(binary_x32), date, priority, process,message, false);
+		}
+		else { //x64
+            		binary_log_check(string(binary_x64), date, priority, process, message, true);
+		}            	
+	    }
             else {
-				fseek(lf, -16, SEEK_CUR);
-				fgets(line, 200, lf);
-                ascii_log_check(line, date, priority, process, message);
-                }
+		cout << "WE FUCKING ASCII" << "\n";
+		fseek(lf, (sizeof(binary_x64)-1), SEEK_CUR); //back track 12 bytes
+		fgets(ascii, sizeof(ascii), lf);
+                ascii_log_check(string(ascii), date, priority, process, message);
+            }
             log_csv(csv, date, priority, process, message);
-       }
-            return CS1_SUCCESS;     
+*/       }
+       return CS1_SUCCESS;     
     }
 
     // faster method to make log entries
