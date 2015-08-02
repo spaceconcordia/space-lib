@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **
 
 !.gitignore
@@ -6,3 +7,27 @@
 !.bash_aliases
 !.CS1_aliases
 !.config/terminator
+=======
+**/*.a
+**/*.so
+**/*.o
+**/*.x
+**/*.log
+**/*.swp
+*swp
+**/*.swo
+shakespeare_test
+shakespeare.h
+fletcher.h
+SC_he100.h
+NamedPipe.h
+Net2Com.h
+timer.h
+include/*.h !include/SpaceDecl.h
+lib/* !lib/README.txt
+
+shakespeare/lib
+utls/bin
+utls/lib
+checksum/lib
+>>>>>>> 9bf91806fe811e385e83c6cc1daa8d4fde9fd0f3
