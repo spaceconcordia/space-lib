@@ -314,16 +314,16 @@ for (unsigned int i = 0; i < 12; ++i) {
             return CS1_NULL_FILE_POINTER;
        };
 
-  //     string priority = "";
-   //    string process = "";
-    //   string message = "";
-     //  string date = "";
+        string priority;
+        string process;
+	string message;
+	string date;
 
-      // char ascii[100];
-       char binary_x64[9];
-      // char binary_x32[9];
-       
-       while (fgets(binary_x64, sizeof(binary_x64), lf)){
+      	char ascii[256];
+      	size_t bin_s = sizeof(BinaryEntryLog) - (sizeof(time_t) + sizeof(u_int8) + sizeof(u_int8) + sizeof(u_int16));
+      	char bin[bin_s];
+      	
+       while (fgets(bin, bin_s, lf)){
 		for (int i = 0; i < 9; ++i) {
 		cout << (int) binary_x64[i] << "\n";
 		}
