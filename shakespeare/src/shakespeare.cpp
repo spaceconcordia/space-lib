@@ -213,58 +213,6 @@ namespace Shakespeare
 
     int binary_log_check(string line, string &date, string &priority, string &process, string &message, bool is_x64) {
 
-	int x64_offset = 0;
-	if (is_x64){
-		x64_offset = 4;
-	}
-for (unsigned int i = 0; i < 12; ++i) {
-	cout << "array pos: " << i << " value: " << (int)line[i] << "\n";
-}
-
-	//TODO endian check, 32 bit, 64 bit check
-	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
-	
-	date = timet_to_date_string(time);
-
-	//priority
-	uint8_t priority_int = (uint8_t) line[x64_offset + 5]; 
-
-	//process
-	uint8_t process_int = (uint8_t) line[x64_offset + 4];
-
-	//message
-	uint8_t first_8bit = (uint8_t) line[x64_offset + 7];
-	uint8_t second_8bit = (uint8_t) line[x64_offset + 6];
-        
-	cout << "priority_int" << (int) priority_int << "\n";
-	cout << "process_int" << (int)process_int << "message 2: " << "\n";
-	//TO DO check endians
-	uint16_t message_int = (uint16_t)first_8bit << 8 | second_8bit ;
-//	uint16_t message_int_2 = (uint16_t)second_8bit << 8 | first_8bit;
-
-	if (priority_int >= sizeof(priorities)/sizeof(priorities[0])){
-		priority = "UNKNOWN";
-	}
-	else { 
-		priority = priorities[(int)priority_int];
-	}
-/*
-	if (process_int >= (int) strlen(*cs1_systems)) {
-		process = "UNKNOWN";
-	}
-	else {
-*/
-	process = cs1_systems[(int)process_int];
-	
-        ostringstream convert;
-	convert << message_int;
-	message = convert.str(); 
-
-	cout << "date: " << date << "\n";
-	cout << "priority: " << priority << "\n";
-	cout << "process: " << process << "\n";
-	cout << "message: " << message << "and   " << (int) message_int << "\n";
-	return CS1_SUCCESS;
     }
 
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
@@ -320,7 +268,13 @@ for (unsigned int i = 0; i < 12; ++i) {
 	string date;
 
       	char ascii[256];
-      	size_t bin_s = sizeof(BinaryEntryLog) - (sizeof(time_t) + sizeof(u_int8) + sizeof(u_int8) + sizeof(u_int16));
+      	size_t bin_s = sizeof(BinaryEntryLog);
+      	size_t padding = (sizeof(time_t) + sizeof(u_int8) + sizeof(u_int8) + sizeof(u_int16));
+      	bool padding;
+      	if (padding > 0)
+      		padding = true;
+      		
+      	bin_s += padding;
       	char bin[bin_s];
       	
        while (fgets(bin, bin_s, lf)){
@@ -328,26 +282,13 @@ for (unsigned int i = 0; i < 12; ++i) {
 		cout << (int) binary_x64[i] << "\n";
 		}
 		cout << "end" << "\n";
-/*            if (binary_ascii_check(binary_x64)) {
+/*            if (bin_check(binary_x64)) {
 		//TODO confirm x32 or x64
 		for (int i = 0; i < 17; ++i){
 			cout << "array position: " << i << "valu " << (int) binary_x64[i] << "\n";
 		}
-
-		
-		if (!check_x64(binary_x64)){ //x32
-			cout << "we are fucking 32 32";		
-			fseek(lf, (sizeof(binary_x64)-1), SEEK_CUR);
-			fgets(binary_x32, sizeof(binary_x32), lf);
-			cout << binary_x32;
-			binary_log_check(string(binary_x32), date, priority, process,message, false);
-		}
-		else { //x64
-            		binary_log_check(string(binary_x64), date, priority, process, message, true);
-		}            	
 	    }
             else {
-		cout << "WE FUCKING ASCII" << "\n";
 		fseek(lf, (sizeof(binary_x64)-1), SEEK_CUR); //back track 12 bytes
 		fgets(ascii, sizeof(ascii), lf);
                 ascii_log_check(string(ascii), date, priority, process, message);
