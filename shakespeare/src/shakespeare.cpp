@@ -211,8 +211,26 @@ namespace Shakespeare
 	return date_string;
     } 
 
-    int binary_log_check(string line, string &date, string &priority, string &process, string &message, bool is_x64) {
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+	size_t read = 0;
+	time_t * time;
+	time = (time_t *)(line + read);
+	date = timet_to_date_string(*time);
+	read += sizeof(time_t);
+	
+	uint8_t * process_id = (uint8_t *)(line + read);
+	process = cs1_systems[(int) *process_id];
+	read += sizeof(uint8_t);
 
+	uint8_t * priority_id = (uint8_t *) (line + read);
+	priority = priorities[(int) *priority_id];
+	read += sizeof(uint8_t);
+
+	uint16_t * data_msg = (uint16_t *)(line + read);
+	message = "1";
+	*data_msg = 10;
+
+	return 0;	
     }
 
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
@@ -268,33 +286,26 @@ namespace Shakespeare
 	string date;
 
       	char ascii[256];
-      	size_t bin_s = sizeof(BinaryEntryLog);
-      	size_t padding = (sizeof(time_t) + sizeof(u_int8) + sizeof(u_int8) + sizeof(u_int16));
-      	bool padding;
-      	if (padding > 0)
-      		padding = true;
-      		
-      	bin_s += padding;
-      	char bin[bin_s];
+      	size_t bin_s = sizeof(time_t) + 2 * sizeof(uint8_t) + sizeof(uint16_t);
+      	char bin[64];
       	
-       while (fgets(bin, bin_s, lf)){
-		for (int i = 0; i < 9; ++i) {
-		cout << (int) binary_x64[i] << "\n";
-		}
-		cout << "end" << "\n";
-/*            if (bin_check(binary_x64)) {
-		//TODO confirm x32 or x64
-		for (int i = 0; i < 17; ++i){
-			cout << "array position: " << i << "valu " << (int) binary_x64[i] << "\n";
-		}
+       while (fgets(bin, (bin_s+1), lf)){
+	      if (binary_ascii_check(bin)) {
+		binary_log_check(bin, date, priority,process,message);
+		
 	    }
             else {
-		fseek(lf, (sizeof(binary_x64)-1), SEEK_CUR); //back track 12 bytes
-		fgets(ascii, sizeof(ascii), lf);
-                ascii_log_check(string(ascii), date, priority, process, message);
+		fseek(lf, (-1 *bin_s), SEEK_CUR); 
+		if (fgets(ascii, sizeof(ascii), lf)){
+			//check for \0
+                	ascii_log_check(string(ascii), date, priority, process, message);
+		}
+		else {
+			return 0;
+		}
             }
             log_csv(csv, date, priority, process, message);
-*/       }
+	 }
        return CS1_SUCCESS;     
     }
 
