@@ -199,6 +199,12 @@ namespace Shakespeare
                 binary = true;
 	    }
         }
+	if (line[10] != ':' && !binary){
+		binary = true;
+	}
+
+	
+	//check for the ":";
         return binary;
     }
 
@@ -216,16 +222,20 @@ namespace Shakespeare
 	time_t * time;
 	time = (time_t *)(line + read);
 	date = timet_to_date_string(*time);
+	cout << "READING TIME_T AT" << read << endl;;
 	read += sizeof(time_t);
 	
 	uint8_t * process_id = (uint8_t *)(line + read);
 	process = cs1_systems[(int) *process_id];
+	cout << "READING UINT8 PROCESS AT" << read << endl;
 	read += sizeof(uint8_t);
 
 	uint8_t * priority_id = (uint8_t *) (line + read);
 	priority = priorities[(int) *priority_id];
+	cout << "READING UNINT 8 PRIORITY AT" << read << endl;
 	read += sizeof(uint8_t);
 
+	cout << "READING UINT16 MESSAGE AT" << read <<  endl;
 	uint16_t * data_msg = (uint16_t *)(line + read);
 	message = "1";
 	*data_msg = 10;
@@ -234,7 +244,7 @@ namespace Shakespeare
     }
 
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
-
+	cout << "CHECKING ASCII \n\n";
         unsigned int index;
 	unsigned int length = entry.length();
 	
@@ -264,14 +274,6 @@ namespace Shakespeare
         return CS1_SUCCESS;
     }
 
-    //worry about this in 2038
-    inline bool check_x64(char* bits) {
-  	if ((int)bits[4] == 0 && (int)bits[5] == 32 && (int)bits[6] == 32 && (int)bits[7] == 32) {
-		return true;
-	}
-	return false;
-    }
-
     //read from file, write to csv
     int log_file_csv(FILE* lf, FILE* csv)
     {
@@ -285,25 +287,25 @@ namespace Shakespeare
 	string message;
 	string date;
 
-      	char ascii[256];
-      	size_t bin_s = sizeof(time_t) + 2 * sizeof(uint8_t) + sizeof(uint16_t);
-      	char bin[64];
+      	char line[256];
+      	size_t bin_s = sizeof(time_t) + 2*sizeof(uint8_t) + sizeof(uint16_t);
       	
-       while (fgets(bin, (bin_s+1), lf)){
-	      if (binary_ascii_check(bin)) {
-		binary_log_check(bin, date, priority,process,message);
+       while (fgets(line, (bin_s+1), lf)){
+	      if (binary_ascii_check(line)) {
+		binary_log_check(line, date, priority,process,message);
 		
 	    }
             else {
 		fseek(lf, (-1 *bin_s), SEEK_CUR); 
-		if (fgets(ascii, sizeof(ascii), lf)){
+		if (fgets(line, sizeof(line), lf)){
 			//check for \0
-                	ascii_log_check(string(ascii), date, priority, process, message);
+                	ascii_log_check(string(line), date, priority, process, message);
 		}
 		else {
 			return 0;
 		}
             }
+	    memset(line, '0', 256);
             log_csv(csv, date, priority, process, message);
 	 }
        return CS1_SUCCESS;     

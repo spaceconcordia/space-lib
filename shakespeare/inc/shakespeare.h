@@ -75,7 +75,7 @@ namespace Shakespeare
     
     int log_csv(FILE* lf, string date, string ePriority, string process, string msg);
     bool binary_ascii_check(char * line);
-    int binary_log_check(string line, string &date, string &priority, string &process, string &message, bool is_x64);
+    int binary_log_check(char * line, string &date, string &priority, string &process, string &message);
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message);
     int log_file_csv(FILE* lf, FILE* csv);
 }

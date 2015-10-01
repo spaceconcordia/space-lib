@@ -186,11 +186,7 @@ TEST_F(Shakespeare_Test, CatchBinaryAscii)
 
 TEST_F(Shakespeare_Test, AsciiCheck)
 {
-   string date = "";
-   string process = "";
-   string priority = "";
-   string message = "";
-
+   string date, process, priority, message;
    string test_entry = "1438447049:WARNING:test_process:test_message\0";
 
    int returned_int = Shakespeare::ascii_log_check(string(test_entry), date, priority, process, message); 
@@ -201,35 +197,13 @@ TEST_F(Shakespeare_Test, AsciiCheck)
    ASSERT_EQ(CS1_SUCCESS, returned_int);
 }
 
+/*
 TEST_F(Shakespeare_Test, BinaryCheck) {
-   string date = "";
-   string process = "";
-   string priority = "";
-   string message = "";
+   string date, priority, process, message;
 
-   char test_entry[12];
+   char test_entry[128];
 
-   //time_t
-   test_entry[0] = (char) -79;
-   test_entry[1] = (char) -11;
-   test_entry[2] = (char) -68;
-   test_entry[3] = (char) 85;
-   test_entry[4] = ' ';
-   test_entry[5] = ' ';
-   test_entry[6] = ' ';
-   test_entry[7] = ' ';
-
-   //priotity 8 bit int
-   test_entry[8] = (char) 12;
-
-   //process id 8 bit int
-   test_entry[9] = (char) 2;
-
-   //message 16 bit int
-   test_entry[10]= (char) -30;
-   test_entry[11]= (char) 46;
-
-   int returned_int = Shakespeare::binary_log_check(string(test_entry), date, priority, process, message, true);
+   int returned_int = Shakespeare::binary_log_check(test_entry, date, priority, process, message);
 
    ASSERT_EQ(date, "20150801 16:37:05");
    ASSERT_EQ(priority, "DEBUG");
@@ -241,18 +215,24 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
    //cout << process << "\n";
    //cout << message << "\n";
 }
-
+*/
 TEST_F(Shakespeare_Test, IntegratedLogCSV)
 {
    using namespace Shakespeare;
-/*
-   FILE * write_log = fopen("log.log", "a");
-   log_bin(write_log, DEBUG, 12, 127);
-//   log_bin(write_log, NOTICE, 10, 12002);
-   log_bin(write_log, NOTICE, 10, 127);
+
+   FILE * write_log = fopen("log.log", "ab");
+   log_bin(write_log, DEBUG, 1, 100);
+   log_bin(write_log, WARNING, 1, 100);
+   log_bin(write_log, ERROR, 2, 101);
+   log_bin(write_log, URGENT, 3, 102);
+   log_bin(write_log, CRITICAL, 4, 103);
+   log_bin(write_log, DEBUG, 4, 103);
+ //  log_bin(write_log, NOTICE, 1, 10);
+ //  log_bin(write_log, NOTICE, 5, 10);
    fclose(write_log);
 
-*/
+  cout << "writing complete";
+
    FILE * csv = fopen("csv.csv", "a");
    FILE * log = fopen("log.log", "r");
    log_file_csv(log, csv);
