@@ -222,41 +222,31 @@ namespace Shakespeare
 	time_t * time;
 	time = (time_t *)(line + read);
 	date = timet_to_date_string(*time);
-	cout << "READING TIME_T AT" << read <<  " VALUE: " << date << endl;;
 	read += sizeof(time_t);
 	
 	uint8_t * process_id = (uint8_t *)(line + read);
-	cout << "PROCESS IS: " << (int)*process_id << endl;
 	process = cs1_systems[*process_id];
-	cout << "PROCESS IS:" << process << endl;
-	cout << "READING UINT8 PROCESS AT" << read << endl;
 	read += sizeof(uint8_t);
 
 	uint8_t * priority_id = (uint8_t *)(line + read);
 	priority = priorities[* priority_id];
-	cout << "READING UNINT 8 PRIORITY AT" << read << endl;
 	read += sizeof(uint8_t);
 
-	cout << "READING UINT16 MESSAGE AT" << read <<  endl;
 	uint16_t * data_msg = (uint16_t *)(line + read);
 	char data_msg_arr[64];
 	snprintf(data_msg_arr, 64, "%d", *data_msg);
 	message = std::string(data_msg_arr);
 	
-	
-	return 0;	
+	return CS1_SUCCESS;	
     }
 
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
-	cout << "CHECKING ASCII:" << entry << endl;
         unsigned int index;
 	unsigned int length = entry.length();
 	
         for (index = 0; index < length && entry[index] != ':'; ++index) {
         }
         string date_raw = entry.substr(0, index);
-
-        //do a check here
         time_t time = (time_t)atol(date_raw.c_str());
 	
 	date = timet_to_date_string(time);
@@ -308,7 +298,7 @@ namespace Shakespeare
 			binary_log_check(line, date, priority, process, message);
 		}
 		else {
-			return 0;
+			return CS1_FAILURE;
 		}
             }
 	    memset(line, '0', 256);

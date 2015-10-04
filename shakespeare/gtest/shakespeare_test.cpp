@@ -201,7 +201,7 @@ TEST_F(Shakespeare_Test, AsciiCheck)
 TEST_F(Shakespeare_Test, BinaryCheck) {
    string date, priority, process, message;
 
-   char test_entry[128];
+
 
    int returned_int = Shakespeare::binary_log_check(test_entry, date, priority, process, message);
 
@@ -210,10 +210,6 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
    ASSERT_EQ(process, "SHAKESPEARE");
    ASSERT_EQ(message, "12002");
    ASSERT_EQ(CS1_SUCCESS, returned_int);
-   //cout << date << "\n";
-   //cout << priority << "\n";
-   //cout << process << "\n";
-   //cout << message << "\n";
 }
 */
 
@@ -223,15 +219,15 @@ TEST_F(Shakespeare_Test, ASCIILogCSV){
 	for (uint16_t i = 0; i != 10; ++i) {
 		log(write_log, Shakespeare::URGENT, "TEST", "TEST TEST");
 	}
-	fclose(write_log);
-	
+	fclose(write_log);	
 	FILE * csv = fopen("ascii.csv", "a+");
 	FILE * log = fopen("ascii_log.log", "a+");
-	int i = log_file_csv(log, csv);
-	
+	int i = log_file_csv(log, csv);	
 	fclose(csv);
 	fclose(log);
-	ASSERT_EQ(0, i);	
+	ASSERT_EQ(CS1_SUCCESS, i);
+	remove("ascii_log.log");
+	remove("ascii.csv");	
 }
 
 TEST_F(Shakespeare_Test, BinaryLogCSV){
@@ -250,6 +246,8 @@ TEST_F(Shakespeare_Test, BinaryLogCSV){
 	log_file_csv(log, csv);
 	fclose(csv);
 	fclose(log);
+	remove("bin.csv");
+	remove("bin_log.log");
 }
 
 TEST_F(Shakespeare_Test, IntegratedLogCSV)
@@ -257,18 +255,16 @@ TEST_F(Shakespeare_Test, IntegratedLogCSV)
    using namespace Shakespeare;
 
    FILE * write_log = fopen("log.log", "a+");
-for (uint16_t i = 0; i != 10; ++i) {
-   log_bin(write_log, DEBUG, 1, i);
-   log_bin(write_log, ERROR, 2, i);
-   log_bin(write_log, URGENT, 3, i);
-   log_bin(write_log, CRITICAL, 4, i);
-  log(write_log, Shakespeare::URGENT, "TEST PROCESS", "TESTING, TESTING");
-   log_bin(write_log, DEBUG, 4, i);
-   log_bin(write_log, NOTICE, 1, i);
-}
+   for (uint16_t i = 0; i != 10; ++i) {
+   	log_bin(write_log, DEBUG, 1, i);
+   	log_bin(write_log, ERROR, 2, i);
+   	log_bin(write_log, URGENT, 3, i);
+   	log_bin(write_log, CRITICAL, 4, i);
+   	log(write_log, Shakespeare::URGENT, "TEST PROCESS", "TESTING, TESTING");
+   	log_bin(write_log, DEBUG, 4, i);
+   	log_bin(write_log, NOTICE, 1, i);
+   }
    fclose(write_log);
-
-  cout << "writing complete";
 
    FILE * csv = fopen("csv.csv", "a+");
    FILE * log = fopen("log.log", "r");
@@ -276,7 +272,8 @@ for (uint16_t i = 0; i != 10; ++i) {
 
    fclose(csv);
    fclose(log);
-
+   remove("log.log");
+   remove("csv.csv");
 }
 
 TEST_F(Shakespeare_Test, NullFilePointer)
