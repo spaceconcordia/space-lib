@@ -181,7 +181,7 @@ TEST_F(Shakespeare_Test, CatchBinaryAscii)
    bool binary;
    char * test_entry = "1438446858:WARNING:test_process:test_message\0";
    binary = Shakespeare::binary_ascii_check(test_entry);
-   ASSERT_EQ(binary, false);
+   ASSERT_EQ(binary, true);
 }
 
 TEST_F(Shakespeare_Test, AsciiCheck)
@@ -216,24 +216,61 @@ TEST_F(Shakespeare_Test, BinaryCheck) {
    //cout << message << "\n";
 }
 */
+
+TEST_F(Shakespeare_Test, ASCIILogCSV){
+	using namespace Shakespeare;
+	FILE * write_log = fopen("ascii_log.log", "a+");
+	for (uint16_t i = 0; i != 10; ++i) {
+		log(write_log, Shakespeare::URGENT, "TEST", "TEST TEST");
+	}
+	fclose(write_log);
+	
+	FILE * csv = fopen("ascii.csv", "a+");
+	FILE * log = fopen("ascii_log.log", "a+");
+	int i = log_file_csv(log, csv);
+	
+	fclose(csv);
+	fclose(log);
+	ASSERT_EQ(0, i);	
+}
+
+TEST_F(Shakespeare_Test, BinaryLogCSV){
+	using namespace Shakespeare;
+	FILE * write_log = fopen("bin_log.log", "ab+");
+	for (uint8_t i = 0; i != 10; ++i){
+		log_bin(write_log, DEBUG, 1, i);
+		log_bin(write_log, ERROR, 2, i);
+		log_bin(write_log, URGENT, 3, i);
+		log_bin(write_log, CRITICAL, 4, i);
+		log_bin(write_log, NOTICE, 5, i);
+	}
+	fclose(write_log);
+	FILE* csv = fopen("bin.csv", "a+");
+	FILE* log = fopen("bin_log.log", "r");
+	log_file_csv(log, csv);
+	fclose(csv);
+	fclose(log);
+}
+
 TEST_F(Shakespeare_Test, IntegratedLogCSV)
 {
    using namespace Shakespeare;
 
-   FILE * write_log = fopen("log.log", "ab");
-   log_bin(write_log, DEBUG, 1, 100);
-   log_bin(write_log, WARNING, 1, 100);
-   log_bin(write_log, ERROR, 2, 101);
-   log_bin(write_log, URGENT, 3, 102);
-   log_bin(write_log, CRITICAL, 4, 103);
-   log_bin(write_log, DEBUG, 4, 103);
- //  log_bin(write_log, NOTICE, 1, 10);
- //  log_bin(write_log, NOTICE, 5, 10);
+   FILE * write_log = fopen("log.log", "a+");
+for (uint16_t i = 0; i != 10; ++i) {
+   log_bin(write_log, DEBUG, 1, i);
+   log_bin(write_log, ERROR, 2, i);
+   log_bin(write_log, URGENT, 3, i);
+   log_bin(write_log, CRITICAL, 4, i);
+  log(write_log, Shakespeare::URGENT, "TEST PROCESS", "TESTING, TESTING");
+   log_bin(write_log, DEBUG, 4, i);
+   log_bin(write_log, NOTICE, 1, i);
+}
    fclose(write_log);
 
   cout << "writing complete";
 
-   FILE * csv = fopen("csv.csv", "a");
+   FILE * csv = fopen("csv.csv", "a+");
    FILE * log = fopen("log.log", "r");
    log_file_csv(log, csv);
 

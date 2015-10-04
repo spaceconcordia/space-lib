@@ -173,7 +173,7 @@ namespace Shakespeare
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%u,%s,%s,%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
     
@@ -191,21 +191,21 @@ namespace Shakespeare
 
     //returns true if binary, false for ascii
     bool binary_ascii_check(char * line){
-        bool binary = false;
+        bool all_ascii = true;
+	bool colon_pos = false;
 	size_t i;
-        for (i = 0; i < strlen(line) && line[i] != '\n'; ++i) {
-            int char_int = (int)line[i];
-            if (char_int >= 128 || char_int < 0){
-                binary = true;
+        for (i = 0; i < strlen(line) && line[i] != '\0'; ++i) {
+	    if (line[i] == ':' && i == 10) {
+		colon_pos = true;
 	    }
-        }
-	if (line[10] != ':' && !binary){
-		binary = true;
+            if ((int)line[i] < 0){
+                all_ascii = false;
+	    }
+        }	
+	if (all_ascii && colon_pos){
+		return true;
 	}
-
-	
-	//check for the ":";
-        return binary;
+        return false;
     }
 
     inline string timet_to_date_string(time_t time) {
@@ -222,29 +222,33 @@ namespace Shakespeare
 	time_t * time;
 	time = (time_t *)(line + read);
 	date = timet_to_date_string(*time);
-	cout << "READING TIME_T AT" << read << endl;;
+	cout << "READING TIME_T AT" << read <<  " VALUE: " << date << endl;;
 	read += sizeof(time_t);
 	
 	uint8_t * process_id = (uint8_t *)(line + read);
-	process = cs1_systems[(int) *process_id];
+	cout << "PROCESS IS: " << (int)*process_id << endl;
+	process = cs1_systems[*process_id];
+	cout << "PROCESS IS:" << process << endl;
 	cout << "READING UINT8 PROCESS AT" << read << endl;
 	read += sizeof(uint8_t);
 
-	uint8_t * priority_id = (uint8_t *) (line + read);
-	priority = priorities[(int) *priority_id];
+	uint8_t * priority_id = (uint8_t *)(line + read);
+	priority = priorities[* priority_id];
 	cout << "READING UNINT 8 PRIORITY AT" << read << endl;
 	read += sizeof(uint8_t);
 
 	cout << "READING UINT16 MESSAGE AT" << read <<  endl;
 	uint16_t * data_msg = (uint16_t *)(line + read);
-	message = "1";
-	*data_msg = 10;
-
+	char data_msg_arr[64];
+	snprintf(data_msg_arr, 64, "%d", *data_msg);
+	message = std::string(data_msg_arr);
+	
+	
 	return 0;	
     }
 
     int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
-	cout << "CHECKING ASCII \n\n";
+	cout << "CHECKING ASCII:" << entry << endl;
         unsigned int index;
 	unsigned int length = entry.length();
 	
@@ -289,17 +293,19 @@ namespace Shakespeare
 
       	char line[256];
       	size_t bin_s = sizeof(time_t) + 2*sizeof(uint8_t) + sizeof(uint16_t);
-      	
-       while (fgets(line, (bin_s+1), lf)){
-	      if (binary_ascii_check(line)) {
-		binary_log_check(line, date, priority,process,message);
-		
-	    }
+	size_t read;
+       while ((read = fread(line, sizeof(char), 2 * bin_s , lf))){
+	    if (binary_ascii_check(line)) {
+		memset(line, '0', 256);
+		fseek(lf, -1 * read, SEEK_CUR);
+		fgets(line, sizeof(line), lf);
+		ascii_log_check(string(line), date, priority,process,message);			
+	   }
             else {
-		fseek(lf, (-1 *bin_s), SEEK_CUR); 
-		if (fgets(line, sizeof(line), lf)){
-			//check for \0
-                	ascii_log_check(string(line), date, priority, process, message);
+		fseek(lf, -1 * read, SEEK_CUR);
+		memset(line, '0', 256); 
+		if (fread(line, sizeof(char), bin_s, lf)){
+			binary_log_check(line, date, priority, process, message);
 		}
 		else {
 			return 0;
