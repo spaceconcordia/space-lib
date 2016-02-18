@@ -173,7 +173,7 @@ namespace Shakespeare
            return CS1_NULL_FILE_POINTER;
         }
         fflush(lf);
-        fprintf(lf, "%u,%s,%s,%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
+        fprintf(lf, "%u:%s:%s:%s\r\n", (unsigned)time(NULL), priorities[ePriority].c_str(), process.c_str(), msg.c_str());
         return 0;
     }
     
@@ -191,87 +191,65 @@ namespace Shakespeare
 
     //returns true if binary, false for ascii
     bool binary_ascii_check(char * line){
-        bool binary = false;
+        bool all_ascii = true;
+	bool colon_pos = false;
 	size_t i;
-        for (i = 0; i < strlen(line) && line[i] != '\n'; ++i) {
-            int char_int = (int)line[i];
-            if (char_int >= 128 || char_int < 0){
-                binary = true;
+        for (i = 0; i < strlen(line) && line[i] != '\0'; ++i) {
+	    if (line[i] == ':' && i == 10) {
+		colon_pos = true;
 	    }
-        }
-        return binary;
+            if ((int)line[i] < 0){
+                all_ascii = false;
+	    }
+        }	
+	if (all_ascii && colon_pos){
+		return true;
+	}
+        return false;
     }
 
-    inline void signed_to_unsigned_binary(int &a) {
-	if (a < 0)
-		a += 256;
-    }
-    
-    inline void timet_to_date_string(time_t time, string &date_string) {
+    inline string timet_to_date_string(time_t time) {
 	tm * ptm = localtime(&time);
 	char * c_date = new  char[32];
 	strftime(c_date, 32, "%Y%m%d %H:%M:%S", ptm);
-	date_string = string(c_date);
-
-	delete ptm;
+	string date_string = string(c_date);
+	delete[] c_date;
+	return date_string;
     } 
 
     int binary_log_check(char * line, string &date, string &priority, string &process, string &message) {
+	size_t read = 0;
+	time_t * time;
+	time = (time_t *)(line + read);
+	date = timet_to_date_string(*time);
+	read += sizeof(time_t);
 	
-//	int sys_bit = sizeof(time_t);
+	uint8_t * process_id = (uint8_t *)(line + read);
+	process = cs1_systems[*process_id];
+	read += sizeof(uint8_t);
 
-	//TODO endian check, 32 bit, 64 bit check
-	time_t time = (time_t)((uint32_t) ((uint16_t) ((uint8_t)line[3]) << 8 | ((uint8_t)line[2])) << 16 | ((uint16_t)((uint8_t)line[1]) << 8 | ((uint8_t)line[0])));
+	uint8_t * priority_id = (uint8_t *)(line + read);
+	priority = priorities[* priority_id];
+	read += sizeof(uint8_t);
+
+	uint16_t * data_msg = (uint16_t *)(line + read);
+	char data_msg_arr[64];
+	snprintf(data_msg_arr, 64, "%d", *data_msg);
+	message = std::string(data_msg_arr);
 	
-	timet_to_date_string(time, date);
-
-	//process
-	int process_int = (int) line[8];
-	signed_to_unsigned_binary(process_int); 
-
-	//priority
-	int priority_int = (int) line[9];
-	signed_to_unsigned_binary(priority_int);
-
-	//message
-	int first_8bit = (int) line[11];
-	int second_8bit = (int) line[10];
-	signed_to_unsigned_binary(first_8bit);
-	signed_to_unsigned_binary(second_8bit);
-
-	//TO DO check endians
-	uint16_t message_int = (uint16_t)first_8bit << 8 | second_8bit ;
-
-	priority = priorities[priority_int];
-
-	process = cs1_systems[process_int];
-
-        ostringstream convert;
-	convert << (int) message_int;
-	message = convert.str();
-
-	return CS1_SUCCESS;
+	return CS1_SUCCESS;	
     }
 
-    int ascii_log_check(char * line, string &date, string &priority, string &process, string &message)  
-{
-	if (line == NULL)
-		return 0;
-
+    int ascii_log_check(string entry, string &date, string &priority, string &process, string &message)  {
         unsigned int index;
-
-	string entry = string(line);
 	unsigned int length = entry.length();
 	
         for (index = 0; index < length && entry[index] != ':'; ++index) {
         }
         string date_raw = entry.substr(0, index);
-
-        //do a check here
         time_t time = (time_t)atol(date_raw.c_str());
 	
-	timet_to_date_string(time, date);
-
+	date = timet_to_date_string(time);
 	//priority
         unsigned int base = ++index;
         for (index = 0; (base + index) < length && entry[base + index] != ':'; ++index)
@@ -293,35 +271,40 @@ namespace Shakespeare
     //read from file, write to csv
     int log_file_csv(FILE* lf, FILE* csv)
     {
-       if (lf == NULL)
+       if (lf == NULL || csv == NULL)
        {
             return CS1_NULL_FILE_POINTER;
-       }
-       string priority;
-       string process;
-       string message;
-       string date;
+       };
 
-       char line[200];
-       char test[17];
-       while (fgets(test, 17, lf)){
-            if (binary_ascii_check(test)) {
-                    //format binary string
-                for (int i = 0; i < 8; ++i) {
-                    if (test[i] == '\0'){
-                        test[i] = ' ';
-                    }                
-                }
-                    binary_log_check(test, date, priority, process, message);
-                }
+        string priority;
+        string process;
+	string message;
+	string date;
+
+      	char line[256];
+      	size_t bin_s = sizeof(time_t) + 2*sizeof(uint8_t) + sizeof(uint16_t);
+	size_t read;
+       while ((read = fread(line, sizeof(char), 2 * bin_s , lf))){
+	    if (binary_ascii_check(line)) {
+		memset(line, '0', 256);
+		fseek(lf, -1 * read, SEEK_CUR);
+		fgets(line, sizeof(line), lf);
+		ascii_log_check(string(line), date, priority,process,message);			
+	   }
             else {
-				fseek(lf, -16, SEEK_CUR);
-				fgets(line, 200, lf);
-                ascii_log_check(line, date, priority, process, message);
-                }
+		fseek(lf, -1 * read, SEEK_CUR);
+		memset(line, '0', 256); 
+		if (fread(line, sizeof(char), bin_s, lf)){
+			binary_log_check(line, date, priority, process, message);
+		}
+		else {
+			return CS1_FAILURE;
+		}
+            }
+	    memset(line, '0', 256);
             log_csv(csv, date, priority, process, message);
-       }
-            return CS1_SUCCESS;     
+	 }
+       return CS1_SUCCESS;     
     }
 
     // faster method to make log entries
