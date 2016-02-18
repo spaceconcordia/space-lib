@@ -1,13 +1,10 @@
-<<<<<<< HEAD
 **
 
-!.gitignore
-!.vimrc
-!.vim/*
-!.bash_aliases
-!.CS1_aliases
-!.config/terminator
-=======
+.vimrc
+.vim/*
+.bash_aliases
+.CS1_aliases
+.config/terminator
 **/*.a
 **/*.so
 **/*.o
@@ -30,4 +27,3 @@ shakespeare/lib
 utls/bin
 utls/lib
 checksum/lib
->>>>>>> 9bf91806fe811e385e83c6cc1daa8d4fde9fd0f3
