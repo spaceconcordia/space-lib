@@ -37,18 +37,16 @@
 
 // TODO these dependencies should be removed, their functionality should be higher level
 #include "SpaceDecl.h"  /*  Space Concordia Global Includes */
-#include "shakespeare.h"
-#include <HE100_constants.h>
-#include <he100.h>
 
 #include <SC_serial.h>
 
 /*  Function prototypes */
 #include <SC_serial_config.h>  /*  Function prototypes */
 
-// logging 
-#define PROCESS "HE100" // TODO this is redundant, HE100 lib should write logs, not this code
-#define MAX_LOG_BUFFER_LEN CS1_MAX_LOG_ENTRY 
+#define SERIAL_FAILED_OPEN_PORT         1
+#define SERIAL_FAILED_CLOSE_PORT        2
+#define SERIAL_NOT_A_TTY                3 
+#define SERIAL_FAILED_SET_BAUD          8
 
 /**
  * Function to configure interface
@@ -65,18 +63,20 @@ SC_configureInterface (int fdin)
     int get_settings = -1;
     if ( ( get_settings = tcgetattr(fdin, &settings) ) < 0 )
     {
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "get config failed: %d, %s, %s, %d", fdin, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_TTY_CONFIG; 
+        printf (
+            "get config failed: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1; 
     }
     // attempt to set input and output baud rate to 9600
     if (cfsetispeed(&settings, B9600) < 0 || cfsetospeed(&settings, SERIAL_BAUDRATE) < 0)
     {
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "failed set BAUD rate: %d, %s, %s, %d", fdin, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_SET_BAUD;
+        printf (
+            "failed set BAUD rate: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
     }
 
     settings.c_iflag &= ~(
@@ -139,23 +139,25 @@ SC_configureInterface (int fdin)
 
     int apply_settings = -1;
     if ( (apply_settings = tcsetattr(fdin, TCSANOW, &settings)) < 0 ) { // apply attributes
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "failed set config: %d, %s, %s, %d", fdin, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_TTY_CONFIG;
+        printf (
+            "failed set config: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
     }
     int flush_device = -1;
     if ( (flush_device = tcsetattr(fdin, TCSAFLUSH, &settings)) < 0 ) { // apply attributes
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "failed flush device: %d, %s, %s, %d", fdin, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_FLUSH;
+        printf (
+            "failed flush device: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
     }
     return 0;
 }
 
 int
-SC_openPort(void)
+SC_openPort(const char * port_address)
 {
     int fdin; // File descriptor for the port
 
@@ -169,17 +171,19 @@ SC_openPort(void)
     );
 
     if (fdin == -1) {
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "Unable to open port: %s, %s, %s, %d", port_address, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_OPEN_PORT;
+        printf (
+            "Unable to open port: %s, %s, %s, %d", 
+            port_address, strerror(errno), __func__, __LINE__
+        );
+        return SERIAL_FAILED_OPEN_PORT;
     }
 
     if ( !isatty(fdin) ) {
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "Not a serial device: %s, %s, %s, %d", port_address, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_NOT_A_TTY;
+        printf (
+            "Not a serial device: %s, %s, %s, %d", 
+            port_address, strerror(errno), __func__, __LINE__
+        );
+        return SERIAL_NOT_A_TTY;
     }
 
     // TODO issue NOOP and check device is on
@@ -194,10 +198,21 @@ SC_closePort(int fdin)
     // TODO: Setting the speed to B0 instructs the modem to "hang up".
     if (close(fdin) == -1)
     {
-        char error[MAX_LOG_BUFFER_LEN];
-        snprintf (error, MAX_LOG_BUFFER_LEN, "Unable to close serial connection: %d, %s, %s, %d", fdin, strerror(errno), __func__, __LINE__);
-        Shakespeare::log(Shakespeare::ERROR, PROCESS, error);
-        return HE_FAILED_CLOSE_PORT;
+        printf (
+            "Unable to close serial connection: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
     }
     return 0;
+}
+
+int SC_readPort(int fdin, unsigned char * buffer, int num_bytes)
+{
+    return read(fdin, &buffer, num_bytes);
+} 
+
+int SC_writePort(int fdin, unsigned char * bytes, int num_bytes)
+{
+    return write(fdin, bytes, num_bytes);
 }

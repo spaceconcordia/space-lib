@@ -23,7 +23,7 @@ DEBUGFLAGS=-ggdb -g -gdwarf-2 -g3 #gdwarf-2 + g3 provides macro info to gdb
 #
 # includes
 #
-INCLUDES = -I./include/ -I$(SPACE_LIB)/shakespeare/inc -I$(SPACE_LIB)/include -I$(SPACE_UPTDATER)/include -I$(SPACE_SCRIPT)/tgz-wizard/include
+INCLUDES = -I./include/ -I$(SPACE_LIB)/shakespeare/inc -I$(SPACE_LIB)/include -I$(SPACE_LIB)/utls/include -I$(SPACE_UPTDATER)/include -I$(SPACE_SCRIPT)/tgz-wizard/include
 INCTESTPATH = -I./tests/stubs/ -I./tests/helpers/include/
 
 #
@@ -40,13 +40,14 @@ CPPUTEST_LIBS=-lCppUTest -lCppUTestExt
 # All Object files, do not use wildcard, add the ones you need explicitly!
 #
 Q6_TAG=Q6
-OBJECTS = bin/i2c-device.o bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o bin/cs1_systems.o
-OBJECTS_Q6 = bin/i2c-device$(Q6_TAG).o bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o bin/cs1_systems$(Q6_TAG).o
+OBJECTS = bin/i2c-device.o bin/Date.o bin/SpaceString.o bin/SystemProcess.o bin/UTestUtls.o bin/fileIO.o bin/dirUtl.o bin/cs1_systems.o bin/SC_serial.o
+OBJECTS_Q6 = bin/i2c-device$(Q6_TAG).o bin/Date$(Q6_TAG).o bin/SpaceString$(Q6_TAG).o bin/SystemProcess$(Q6_TAG).o bin/UTestUtls$(Q6_TAG).o bin/fileIO$(Q6_TAG).o bin/dirUtl$(Q6_TAG).o bin/cs1_systems$(Q6_TAG).o bin/SC_serial$(Q6_TAG).o
 
 #
 # CppUTest files, no wildcard, add files explicitly!
 #
-UNIT_TEST = tests/utl-test.cpp tests/i2c-device-test.cpp
+UNIT_TEST = tests/utl-test.cpp tests/i2c-device-test.cpp tests/serial-test.cpp
+
 CS1_UTEST_DIR="cs1_utest" # as defined in SpaceDecl.h
 
 #
