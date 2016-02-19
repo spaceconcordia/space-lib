@@ -157,6 +157,48 @@ SC_configureInterface (int fdin)
 }
 
 int
+SC_configureInterface (int fdin, struct termios settings)
+{
+
+    // get current settings
+    int get_settings = -1;
+    if ( ( get_settings = tcgetattr(fdin, &settings) ) < 0 )
+    {
+        printf (
+            "getting config (before setting) failed: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1; 
+    }
+
+    fcntl(
+        fdin,
+        F_SETFL,
+        FNDELAY // return 0 if no chars available on port (non-blocking)
+    ); // immediate reads
+
+    tcflush(fdin, TCIFLUSH); // flush port before persisting changes
+
+    int apply_settings = -1;
+    if ( (apply_settings = tcsetattr(fdin, TCSANOW, &settings)) < 0 ) { // apply attributes
+        printf (
+            "failed set config: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
+    }
+    int flush_device = -1;
+    if ( (flush_device = tcsetattr(fdin, TCSAFLUSH, &settings)) < 0 ) { // apply attributes
+        printf (
+            "failed flush device: %d, %s, %s, %d", 
+            fdin, strerror(errno), __func__, __LINE__
+        );
+        return -1;
+    }
+    return 0;
+}
+
+int
 SC_openPort(const char * port_address)
 {
     int fdin; // File descriptor for the port
@@ -191,6 +233,41 @@ SC_openPort(const char * port_address)
       return(fdin);
 }
 
+int
+SC_openPort(const char * port_address, struct termios settings)
+{
+    int fdin; // File descriptor for the port
+
+    fdin = open(
+        port_address,
+          O_RDWR // O_RDWR read and write (CREAD, )
+        | O_NOCTTY // port never becomes the controlling terminal
+        | O_NDELAY // use non-blocking I/O
+        | O_NONBLOCK
+        // CLOCAL don't allow control of the port to be changed
+    );
+
+    if (fdin == -1) {
+        printf (
+            "Unable to open port: %s, %s, %s, %d", 
+            port_address, strerror(errno), __func__, __LINE__
+        );
+        return SERIAL_FAILED_OPEN_PORT;
+    }
+
+    if ( !isatty(fdin) ) {
+        printf (
+            "Not a serial device: %s, %s, %s, %d", 
+            port_address, strerror(errno), __func__, __LINE__
+        );
+        return SERIAL_NOT_A_TTY;
+    }
+
+    // TODO issue NOOP and check device is on
+    if ( SC_configureInterface(fdin, settings) != 0 ) fdin = -1;
+      return(fdin);
+}
+
 /* Function to close serial device connection at given file descriptor */
 int
 SC_closePort(int fdin)
@@ -215,6 +292,5 @@ int SC_readPort(int fdin, unsigned char * buffer, int num_bytes)
 
 int SC_writePort(int fdin, unsigned char * bytes, int num_bytes)
 {
-    // TODO error checking
     return write(fdin, bytes, num_bytes);
 }
