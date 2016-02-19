@@ -32,7 +32,7 @@ TEST_GROUP(SerialTestGroup)
     }
 };
 
-TEST(SerialTestGroup, UTestSerial_ReadTest)
+TEST(SerialTestGroup, UTestSerial_OpenWriteReadTest)
 {
     // prepare mock bytes to test with
     unsigned char mock_bytes[36] = {0x48,0x65,0x20,0x04,0x00,0x1a,0x3e,0xa6,0x86,0xa2,0x40,0x40,0x40,0x40,0x60,0xac,0x8a,0x64,0x86,0xaa,0x82,0xe1,0x03,0xf0,0x6b,0x65,0x6e,0x77,0x6f,0x6f,0x64,0x0d,0x8d,0x08,0x63,0x9f};
@@ -42,21 +42,22 @@ TEST(SerialTestGroup, UTestSerial_ReadTest)
     int pds; // the slave pseudo tty to read from
 
     // set up master
-    pdm = open("/dev/ptmx", O_RDWR | O_NOCTTY);
-    if (pdm < 0) CHECK_EQUAL(0,pdm);
+    pdm = SC_openPort("/dev/ptmx"/*, O_RDWR | O_NOCTTY*/);
+    CHECK(pdm != -1);
 
     // assign slave
     grantpt(pdm);
     unlockpt(pdm);
-    pds = open(ptsname(pdm), O_RDWR | O_NOCTTY);
+    pds = SC_openPort(ptsname(pdm)/*, O_RDWR | O_NOCTTY*/);
 
-    if (pds < 0) CHECK_EQUAL(0,pds);
+    CHECK(pds != -1);
+
     // write series of bytes to mock serial device, intended to be our incoming transmission
     int w;
     w = SC_writePort (pds, mock_bytes, 36);
     CHECK_EQUAL(36,w);
 
-    // invoke HE100_read
+    // read the bytes, the same ones written should come back
     int r;
     unsigned char payload[36] = {0};
     r = SC_readPort(pdm, payload, 36); // TODO ptr-ptr
@@ -68,12 +69,20 @@ TEST(SerialTestGroup, UTestSerial_ReadTest)
             payload[z]
         );
     }
+    
+    // final check to make sure read returns the right number of bytes
+    CHECK_EQUAL(36, r);
 
     // flush and close the pseudo serial devices
-    fsync(pdm);fsync(pds);
-    close(pdm);close(pds);
+    fsync(pdm);
+    fsync(pds);
 
-    // final check to make sure read returns successfully
-    CHECK_EQUAL(26, r);
+    // close both pseudo terminal connections
+    int pdmc = SC_closePort(pdm);
+    int pdsc = SC_closePort(pds);
+
+    // check that the return status was successful when closing
+    CHECK_EQUAL(0,pdmc);
+    CHECK_EQUAL(0,pdsc);
 }
 

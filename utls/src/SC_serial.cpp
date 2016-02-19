@@ -209,10 +209,12 @@ SC_closePort(int fdin)
 
 int SC_readPort(int fdin, unsigned char * buffer, int num_bytes)
 {
-    return read(fdin, &buffer, num_bytes);
+    // TODO error checking
+    return read(fdin, buffer, num_bytes);
 } 
 
 int SC_writePort(int fdin, unsigned char * bytes, int num_bytes)
 {
+    // TODO error checking
     return write(fdin, bytes, num_bytes);
 }
